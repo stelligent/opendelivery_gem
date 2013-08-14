@@ -1,0 +1,8 @@
+require 'lib/eops/artifact.rb'
+require 'lib/eops/database.rb'
+require 'lib/eops/domain.rb'
+require 'lib/eops/image.rb'
+require 'lib/eops/instance.rb'
+require 'lib/eops/key_pair.rb'
+require 'lib/eops/stack.rb'
+require 'lib/eops/storage.rb'
