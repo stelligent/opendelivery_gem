@@ -10,7 +10,7 @@ spec = Gem::Specification.new do |s|
   s.platform = Gem::Platform::RUBY
   s.summary = "Elastic Operations tools and utilities"
   s.description = "A collection of tools that are used in the Elastic Operations Continuous Delivery Pipeline."
-  s.files       = FileList["lib/*.rb","lib/common-step-definitions/*.rb"]
+  s.files       = FileList["lib/*.rb","lib/eops/*.rb"]
   s.require_paths << 'lib'
   s.required_ruby_version = '>= 1.9.3'
   s.add_development_dependency('aws-sdk', '1.15.0')
