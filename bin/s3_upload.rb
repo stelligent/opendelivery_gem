@@ -10,6 +10,7 @@ end
 storage = Storage.new
 artifact = Artifact.new
 domain = Domain.new
+s3 = AWS::S3.new
 
 bucket = domain.get_property(opts[:sdbdomain], "s3_bucket", "name")
 
@@ -17,4 +18,4 @@ stamped_key = artifact.add_timestamp(opts[:buildnumber], opts[:key])
 
 storage.upload(opts[:filename], bucket, stamped_key)
 
-storage.copy(bucket, stamped_key, "#{opts[:key]}-latest")
+s3.buckets[bucket].objects[stamped_key].copy_to("#{opts[:key]}-latest")
