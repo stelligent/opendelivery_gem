@@ -10,8 +10,8 @@ opts = Trollop::options do
   opt :availabilityzone, "AZ for template to run in", :short => 'a', :type => String
 end
 
-domain = Domain.new
-stack = Stack.new
+domain = OpenDelivery::Domain.new
+stack = OpenDelivery::Stack.new
 
 template = File.expand_path("../../../../infrastructure/cloudformation/#{opts[:templatename]}", __FILE__)
 
@@ -31,4 +31,4 @@ params = {
   "SimpleDBDomain"     => opts[:sdbdomain],
 }
 
-stack.create(template, opts[:stackname], params, opts[:stackname].include?('DB'))
+stack.create(template, opts[:sdbdomain], opts[:stackname], params, opts[:stackname].include?('DB'))

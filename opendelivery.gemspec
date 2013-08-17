@@ -4,7 +4,7 @@ require File.join([ File.dirname(__FILE__), 'lib', 'opendelivery', 'version.rb' 
 spec = Gem::Specification.new do |s|
   s.name          = 'opendelivery'
   s.license       = 'MIT'
-  s.version       = Opendelivery::VERSION
+  s.version       = OpenDelivery::VERSION
   s.author        = [ "Brian Jakovich", "Jonny Sywulak", "Stelligent" ]
   s.email         = 'brian.jakovich@stelligent.com'
   s.homepage      = 'http://stelligent.com'

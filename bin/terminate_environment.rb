@@ -5,8 +5,6 @@ opts = Trollop::options do
   opt :sdbdomain, "Name of SimpleDB Domain", :short =>  "d", :type => String
 end
 
-domain = Domain.new
-stack = Stack.new
+stack = OpenDelivery::Stack.new
 
-domain.destroy_item(opts[:sdbdomain], opts[:stackname])
-stack.destroy(opts[:stackname])
+stack.destroy(opts[:sdbdomain], opts[:stackname])

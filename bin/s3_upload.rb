@@ -7,9 +7,9 @@ opts = Trollop::options do
   opt :sdbdomain, "Name of sdb domain", :short => "q", :type => String
 end
 
-storage = Storage.new
-artifact = Artifact.new
-domain = Domain.new
+storage = OpenDelivery::Storage.new
+artifact = OpenDelivery::Artifact.new
+domain = OpenDelivery::Domain.new
 s3 = AWS::S3.new
 
 bucket = domain.get_property(opts[:sdbdomain], "s3_bucket", "name")

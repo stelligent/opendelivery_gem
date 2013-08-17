@@ -6,8 +6,8 @@ module OpenDelivery
       @domain = OpenDelivery::Domain.new
     end
 
-    def create(template, domain, name, parameters = {}, wait=false)
-      stack = @cfn.stacks.create(name,
+    def create(template, domain, stack_name, parameters = {}, wait=false)
+      stack = @cfn.stacks.create(stack_name,
         File.open(template, "r").read,
         :parameters => parameters,
         :capabilities => ["CAPABILITY_IAM"],
@@ -18,17 +18,17 @@ module OpenDelivery
       end
 
       stack.resources.each do |resource|
-        @domain.set_property(domain, name, resource.resource_type, resource.physical_resource_id)
+        @domain.set_property(domain, stack_name, resource.resource_type, resource.physical_resource_id)
       end
     end
 
-    def destroy(domain, name)
-      stack = @cfn.stacks[name]
+    def destroy(domain, stack_name)
+      stack = @cfn.stacks[stack_name]
       stack.delete
       while stack.exists?
         sleep 20
       end
-      @domain.destroy_item(domain, name)
+      @domain.destroy_item(domain, stack_name)
     end
 
     def list
