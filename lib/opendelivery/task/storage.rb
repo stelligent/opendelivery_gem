@@ -1,8 +1,10 @@
+require 'aws-sdk'
+
 module OpenDelivery
   class Storage
 
     def initialize
-      @s3 = AWS::S3.new
+      @s3 = AWS::S3.new(cred)
     end
 
     def upload(file, bucket, key)

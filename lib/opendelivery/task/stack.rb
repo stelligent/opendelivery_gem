@@ -1,9 +1,11 @@
+require 'aws-sdk'
+
 module OpenDelivery
   class Stack
 
     def initialize
-      @cfn = AWS::CloudFormation.new
-      @domain = OpenDelivery::Domain.new
+      @cfn = AWS::CloudFormation.new(cred)
+      @domain = OpenDelivery::Domain.new(cred)
     end
 
     def create(template, domain, stack_name, parameters = {}, wait=false)

@@ -1,10 +1,12 @@
+require 'aws-sdk'
+
 module OpenDelivery
   class Image
 
-    def initialize
-      @ec2 = AWS::EC2.new
-      @auto_scale = AWS::AutoScaling.new
-      @domain = OpenDelivery::Domain.new
+    def initialize cred
+      @ec2 = AWS::EC2.new(cred)
+      @auto_scale = AWS::AutoScaling.new(cred)
+      @domain = OpenDelivery::Domain.new(cred)
     end
 
     def create(domain, stack_name, type, key)

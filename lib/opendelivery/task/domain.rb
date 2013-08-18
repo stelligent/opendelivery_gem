@@ -1,8 +1,10 @@
+require 'aws-sdk'
+
 module OpenDelivery
   class Domain
 
-    def initialize
-      @sdb = AWS::SimpleDB.new
+    def initialize cred
+      @sdb = AWS::SimpleDB.new(cred)
     end
 
     def create(domain_name)
