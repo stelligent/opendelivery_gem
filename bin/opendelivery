@@ -1,1 +1,79 @@
 #!/usr/bin/env ruby
+require 'gli'
+require 'json'
+
+begin # Remove this begin/rescue before distributing the app
+  require 'cloudpatrol'
+rescue LoadError
+  exit 64
+end
+
+include GLI::App
+
+program_desc "Helps run the OpenDelivery platform"
+
+version OpenDelivery::VERSION
+
+result = []
+
+desc 'Specify AWS Access Key ID'
+arg_name 'string'
+flag :aws_access_key_id
+
+desc 'Specify AWS Secret Access Key'
+arg_name 'string'
+flag :aws_secret_access_key
+
+desc 'Specify region'
+arg_name 'string'
+flag :region
+
+desc 'Specify config file'
+flag :config_file
+
+desc 'Display performance log of the task'
+default_value false
+switch [ :log ]
+
+desc 'CloudFormation Stack'
+command "stack" do |c|
+  c.flag [ :sdb, :sdbdomain ]
+  c.flag [ :stack, :stackname ]
+  c.flag [ :key, :keypair ]
+  c.flag [ :template, :templatename ]
+  c.flag [ :type, :instancetype ]
+
+  c.desc 'Create CloudFormation stack for OpenDelivery'
+  c.command "create" do |subc|
+    subc.action do |global_options,options,args|
+      domain        = option[:sdbdomain]    or raise "Specify the SimpleDB domain to get the pipeline metadata from using -sdb or --sdbdomain"
+      stack_name    = option[:stackname]    or raise "Specify the name of the CloudFormation stack you want to create using -stack or --stackname"
+      key_pair      = option[:keypair]      or raise "Specify the EC2 key pair you want your instance to be created with using -key or --keypair"
+      template      = option[:templatename] or raise "Specify the location you the CloudFormation template you would like to boot from using -template or --templatename"
+      instance_type = option[:instancetype] or raise "Specify the instance type/size you would like to boot from using -type or --instancetype"
+
+
+      result = OpenDelivery.perform($aws_credentials, :Stack, :create, [domain, stack_name, key_pair, template, instance_type] )
+      puts "Creating CloudFormation stack"
+    end
+  end
+end
+
+
+pre do |global, command, options, args|
+  $aws_credentials = {}
+  $config = {}
+
+  if global[:config_file]
+    if File.readable?(global[:config_file])
+      $config = JSON.parse(File.read(global[:config_file])) rescue raise(ArgumentError, "invalid config file")
+    else
+      raise ArgumentError, "--config_file: no such file"
+    end
+  end
+
+  $aws_credentials[:access_key_id] = global[:aws_access_key_id] || $config["aws_access_key_id"] || raise(ArgumentError, "--aws_access_key_id or --config_file is required")
+  $aws_credentials[:secret_access_key] = global[:aws_secret_access_key] || $config["aws_secret_access_key"] || raise(ArgumentError, "--aws_secret_access_key or --config_file is required")
+  $aws_credentials[:region] = global[:region] or "us-east-1"
+  true
+end
