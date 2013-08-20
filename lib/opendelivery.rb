@@ -1,19 +1,10 @@
 require 'opendelivery/version.rb'
-require 'opendelivery/task.rb'
+require 'opendelivery/artifact.rb'
+require 'opendelivery/domain.rb'
+require 'opendelivery/image.rb'
+require 'opendelivery/stack.rb'
+require 'opendelivery/storage.rb'
+
 
 module OpenDelivery
-  def self.perform aws_credentials, klass, method, *args
-    response = {}
-
-    response[:task] = begin
-      response[:formatted] = Task.const_get(klass).new(aws_credentials).send(method, *args)
-    rescue AWS::Errors::Base => e
-      response[:formatted] = "AWS error: #{e}"
-      false
-    rescue
-      response[:formatted] = "Unknown error"
-      false
-    end
-    response
-  end
 end
