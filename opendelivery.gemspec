@@ -17,4 +17,5 @@ spec = Gem::Specification.new do |s|
   s.required_ruby_version = '>= 1.9.3'
   s.add_development_dependency('aws-sdk', '1.15.0')
   s.add_runtime_dependency('aws-sdk', '1.15.0')
+  s.add_dependency('json')
 end
