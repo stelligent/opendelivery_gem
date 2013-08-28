@@ -28,7 +28,7 @@ module OpenDelivery
       end
     end
 
-    def prep_instance(domain stack_name)
+    def prep_instance(domain, stack_name)
       group_name = @domain.get_property(domain, stack_name, "AWS::AutoScaling::AutoScalingGroup")
       instance = @auto_scale.groups[group_name].auto_scaling_instances.first.id
       @ec2.instances[instance].stop
