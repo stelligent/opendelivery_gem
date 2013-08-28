@@ -3,15 +3,13 @@ require 'aws-sdk'
 module OpenDelivery
   class Stack
 
-    def initialize(region=nil, silent=false, sleep_time=30)
+    def initialize(region=nil)
       if region.nil?
         @cfn = AWS::CloudFormation.new
       else
         @cfn = AWS::CloudFormation.new(:region => region)
       end
-
-      @sleep_time = sleep_time
-      @silent = silent
+      @domain = OpenDelivery::Domain.new
     end
 
 
@@ -36,11 +34,11 @@ module OpenDelivery
 
     attr_accessor :sleep_time, :silent, :cfm
 
-    def watch stack_name
+    def watch(stack_name, sleep_time, silent=false)
       success = false
       begin
         stack = @cfn.stacks[stack_name]
-        success = watch_loop stack
+        success = watch_loop(stack, sleep_time, silent)
       rescue AWS::CloudFormation::Errors::ValidationError => msg
         print_status "Exception raised: #{msg}"
         success = false
@@ -100,7 +98,7 @@ module OpenDelivery
       end
     end
 
-    def watch_loop stack
+    def watch_loop(stack, sleep_time, silent)
       keep_watching = true
       success = false
       abort_count = 10
@@ -108,29 +106,34 @@ module OpenDelivery
         begin
           stack_status = stack.status
           if (SUCCESS_STATUSES.include? stack_status)
-            print_status "Success: #{stack_status}"
+            status = "Success: #{stack_status}"
+            print_status(status, silent)
             success = true
             keep_watching = false
           elsif (PROGRESS_STATUSES.include? stack_status)
-            print_status "In Progress: #{stack_status}"
+            status = "In Progress: #{stack_status}"
+            print_status(status, silent)
             success = false
             keep_watching = true
           elsif (FAILURE_STATUSES.include? stack_status)
-            print_status "Failed: #{stack_status}"
+            status = "Failed: #{stack_status}"
+            print_status(status, silent)
             success = false
             keep_watching = false
           else
-            print_status "didn't find #{stack_status} in the list of expected statuses"
+            status = "didn't find #{stack_status} in the list of expected statuses"
+            print_status(status, silent)
             success = false
             abort_count = abort_count - 1
             # if we get too many unknown statuses, assume something has gone horribly wrong and quit.
             keep_watching = (abort_count > 0)
           end
         rescue AWS::CloudFormation::Errors::Throttling
-          print_status "Rate limit exceeded, retrying..."
-          sleep (@sleep_time * 0.1)
+          status = "Rate limit exceeded, retrying..."
+          print_status(status, silent)
+          sleep (sleep_time * 0.1)
         end
-        sleep(@sleep_time)
+        sleep(sleep_time)
       end
       return success
     end
