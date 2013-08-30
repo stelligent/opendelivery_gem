@@ -1,3 +1,5 @@
+require 'aws-sdk'
+
 module OpenDelivery
   class Storage
 
@@ -39,6 +41,12 @@ module OpenDelivery
           file.write(chunk)
         end
       end
+    end
+
+    def add_timestamp(build_identifier, artifact)
+      timestamp = Time.now.strftime("%Y.%m.%d.%H.%M.%S.%L")
+      stamped_artifact = "#{artifact}-#{build_identifier}-#{timestamp}"
+      return stamped_artifact
     end
   end
 end
