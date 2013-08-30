@@ -32,8 +32,6 @@ module OpenDelivery
       "UPDATE_ROLLBACK_IN_PROGRESS",
       "UPDATE_ROLLBACK_COMPLETE_CLEANUP_IN_PROGRESS" ]
 
-    attr_accessor :sleep_time, :silent, :cfm
-
     def watch(stack_name, sleep_time, silent=false)
       success = false
       begin
@@ -47,7 +45,7 @@ module OpenDelivery
     end
 
 
-    def create(template, stack_name, parameters = {}, wait=false)
+    def create(stack_name, template, parameters = {}, wait=false, domain=nil)
       stack = @cfn.stacks.create(stack_name,
         File.open(template, "r").read,
         :parameters => parameters,
@@ -58,13 +56,16 @@ module OpenDelivery
         wait_for_stack(stack)
       end
 
-      stack.resources.each do |resource|
-        @domain.set_property(domain, stack_name, resource.resource_type, resource.physical_resource_id)
+      if domain.nil
+        stack.resources.each do |resource|
+          @domain.set_property(domain, stack_name, resource.resource_type, resource.physical_resource_id)
+        end
       end
     end
 
-    def destroy(domain, stack_name, wait=false)
+    def destroy(stack_name, domain=nil, wait=false)
       stack = @cfn.stacks[stack_name]
+      unless stack.exists? raise "Stack: #{stack_name} doesn't exist, therefore it cannot be destroyed"
       stack.delete
       while wait and stack.exists?
         sleep 20
@@ -78,22 +79,21 @@ module OpenDelivery
       end
     end
 
-    protected
+    private
 
     def wait_for_stack(stack)
       while stack.status != "CREATE_COMPLETE"
         sleep 20
 
-        case stack.status
-        when "ROLLBACK_IN_PROGESS" || "ROLLBACK_COMPLETE"
+        if FAILURE_STATUSES.include? stack.status
           stack.delete
         end
       end
     end
 
-    def print_status status
+    def print_status(status, silent)
       timestamp = Time.now.strftime("%Y.%m.%d %H:%M:%S:%L")
-      if (!@silent)
+      unless silent
         puts "#{timestamp}: #{status}"
       end
     end
