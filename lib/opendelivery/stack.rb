@@ -9,7 +9,7 @@ module OpenDelivery
       else
         @cfn = AWS::CloudFormation.new(:region => region)
       end
-      @domain = OpenDelivery::Domain.new
+      @domain = OpenDelivery::Domain.new region
     end
 
 
@@ -63,10 +63,10 @@ module OpenDelivery
       end
     end
 
-    def destroy(domain, stack_name)
+    def destroy(domain, stack_name, wait=false)
       stack = @cfn.stacks[stack_name]
       stack.delete
-      while stack.exists?
+      while wait and stack.exists?
         sleep 20
       end
       @domain.destroy_item(domain, stack_name)
