@@ -18,30 +18,22 @@ module OpenDelivery
     end
 
     def destroy(domain)
-      @sdb.domains[domain].delete
-    end
-
-    def destroy_item(domain, item_name)
-      @sdb.domains[domain].items[item_name].delete
+      AWS::SimpleDB.consistent_reads do
+        @sdb.domains[domain].delete
+      end
     end
 
     def get_property(domain, item_name, key)
       AWS::SimpleDB.consistent_reads do
         item = @sdb.domains[domain].items[item_name]
-        item.attributes.each_value do |name, value|
-          if name == key
-            @property_value = value.chomp
-          end
-        end
+        property_value = item.attributes[key].values[0].chomp
       end
-
-      return @property_value
     end
 
-    def set_property(domain, item_name, property, value)
+    def set_property(domain, item_name, key, value)
       AWS::SimpleDB.consistent_reads do
         item = @sdb.domains[domain].items[item_name]
-        item.attributes.set(property => [value])
+        item.attributes.set(key => [value])
       end
     end
   end
