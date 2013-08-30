@@ -79,7 +79,7 @@ module OpenDelivery
         end
       end
 
-      private
+      protected
 
       def wait_for_stack(stack)
         while stack.status != "CREATE_COMPLETE"

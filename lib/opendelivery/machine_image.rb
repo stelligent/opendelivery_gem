@@ -28,7 +28,7 @@ module OpenDelivery
       @domain.set_property(domain, key, type, image.id)
     end
 
-    private
+    protected
 
     def wait_for_image(image)
       # Waiting for AWS to realize the image is ready to start
