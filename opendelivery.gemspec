@@ -1,5 +1,4 @@
 require 'rake'
-require File.join([ File.dirname(__FILE__), 'lib', 'opendelivery' ])
 
 spec = Gem::Specification.new do |s|
   s.name          = 'opendelivery'
