@@ -56,7 +56,7 @@ module OpenDelivery
         wait_for_stack(stack)
       end
 
-      if domain.nil
+      unless domain.nil?
         stack.resources.each do |resource|
           @domain.set_property(domain, stack_name, resource.resource_type, resource.physical_resource_id)
         end
