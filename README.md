@@ -15,6 +15,17 @@ While Ruby can be installed on many operating systems, we've included detailed i
 
 Since you will be using [AWS EC2](https://console.aws.amazon.com/ec2/) to install AWS.
 
+## Create your AWS Config file
+
+AWS.config(
+:access_key_id => "AKIAISHDASD7MBC7fHA",
+:secret_access_key => "vEUt0O/UZkDDC2sa/44wAaZ7uHASDASDbStfgujiInFF",
+:region => "us-west-1")
+
+## Install Ruby and its dependencies
+
+Install ruby 1.9.3
+
 ## LICENSE
 
 Copyright (c) 2013 Stelligent Systems LLC
