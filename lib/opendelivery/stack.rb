@@ -72,71 +72,71 @@ module OpenDelivery
         end
         @domain.destroy_item(domain, stack_name)
       end
+    end
 
-      def list
-        @cfn.stacks.each do |stack|
-          puts "Stack Name: #{stack.name} | Status: #{stack.status}"
+    def list
+      @cfn.stacks.each do |stack|
+        puts "Stack Name: #{stack.name} | Status: #{stack.status}"
+      end
+    end
+
+    protected
+
+    def wait_for_stack(stack)
+      while stack.status != "CREATE_COMPLETE"
+        sleep 20
+
+        if FAILURE_STATUSES.include? stack.status
+          stack.delete
         end
       end
+    end
 
-      protected
-
-      def wait_for_stack(stack)
-        while stack.status != "CREATE_COMPLETE"
-          sleep 20
-
-          if FAILURE_STATUSES.include? stack.status
-            stack.delete
-          end
-        end
+    def print_status(status, silent)
+      timestamp = Time.now.strftime("%Y.%m.%d %H:%M:%S:%L")
+      unless silent
+        puts "#{timestamp}: #{status}"
       end
+    end
 
-      def print_status(status, silent)
-        timestamp = Time.now.strftime("%Y.%m.%d %H:%M:%S:%L")
-        unless silent
-          puts "#{timestamp}: #{status}"
-        end
-      end
-
-      def watch_loop(stack, sleep_time, silent)
-        keep_watching = true
-        success = false
-        abort_count = 10
-        while(keep_watching) do
-          begin
-            stack_status = stack.status
-            if (SUCCESS_STATUSES.include? stack_status)
-              status = "Success: #{stack_status}"
-              print_status(status, silent)
-              success = true
-              keep_watching = false
-            elsif (PROGRESS_STATUSES.include? stack_status)
-              status = "In Progress: #{stack_status}"
-              print_status(status, silent)
-              success = false
-              keep_watching = true
-            elsif (FAILURE_STATUSES.include? stack_status)
-              status = "Failed: #{stack_status}"
-              print_status(status, silent)
-              success = false
-              keep_watching = false
-            else
-              status = "didn't find #{stack_status} in the list of expected statuses"
-              print_status(status, silent)
-              success = false
-              abort_count = abort_count - 1
-              # if we get too many unknown statuses, assume something has gone horribly wrong and quit.
-              keep_watching = (abort_count > 0)
-            end
-          rescue AWS::CloudFormation::Errors::Throttling
-            status = "Rate limit exceeded, retrying..."
+    def watch_loop(stack, sleep_time, silent)
+      keep_watching = true
+      success = false
+      abort_count = 10
+      while(keep_watching) do
+        begin
+          stack_status = stack.status
+          if (SUCCESS_STATUSES.include? stack_status)
+            status = "Success: #{stack_status}"
             print_status(status, silent)
-            sleep (sleep_time * 0.1)
+            success = true
+            keep_watching = false
+          elsif (PROGRESS_STATUSES.include? stack_status)
+            status = "In Progress: #{stack_status}"
+            print_status(status, silent)
+            success = false
+            keep_watching = true
+          elsif (FAILURE_STATUSES.include? stack_status)
+            status = "Failed: #{stack_status}"
+            print_status(status, silent)
+            success = false
+            keep_watching = false
+          else
+            status = "didn't find #{stack_status} in the list of expected statuses"
+            print_status(status, silent)
+            success = false
+            abort_count = abort_count - 1
+            # if we get too many unknown statuses, assume something has gone horribly wrong and quit.
+            keep_watching = (abort_count > 0)
           end
-          sleep(sleep_time)
+        rescue AWS::CloudFormation::Errors::Throttling
+          status = "Rate limit exceeded, retrying..."
+          print_status(status, silent)
+          sleep (sleep_time * 0.1)
         end
-        return success
+        sleep(sleep_time)
       end
+      return success
     end
   end
 end
