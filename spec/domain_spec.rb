@@ -62,6 +62,29 @@ describe OpenDelivery::Domain do
       end
     end
 
+    describe "destroy item" do
+
+      before(:each) do
+        @item_name = "item_name"
+        @key = "test_key_1"
+        @expected_value = "test_value_1"
+
+        AWS::SimpleDB.consistent_reads do
+          @sdb.domains.create(@domain_name)
+        end
+
+        @sdb.domains[@domain_name].items.create(@item_name, { @key => @expected_value } )
+      end
+
+      it "should destroy the item" do
+        @domain_under_test.destroy_item(@domain_name, @item_name)
+        AWS::SimpleDB.consistent_reads do
+          @sdb.domains[@domain_name].items.size.should eql 0
+        end
+      end
+
+    end
+
     describe "get property" do
 
       before(:each) do
