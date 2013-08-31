@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    opendelivery (0.0.8)
+    opendelivery (0.0.13)
       aws-sdk (= 1.16.0)
       json
 
