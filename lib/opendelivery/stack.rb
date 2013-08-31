@@ -6,10 +6,12 @@ module OpenDelivery
     def initialize(region=nil)
       if region.nil?
         @cfn = AWS::CloudFormation.new
+        @autoscaling = AWS::AutoScaling.new
       else
+        @autoscaling = AWS::AutoScaling.new(:region => region)
         @cfn = AWS::CloudFormation.new(:region => region)
       end
-      @domain = OpenDelivery::Domain.new region
+      @domain = OpenDelivery::Domain.new(region)
     end
 
 
@@ -66,6 +68,7 @@ module OpenDelivery
     def destroy(stack_name, domain=nil, wait=false)
       stack = @cfn.stacks[stack_name]
       unless stack.exists? raise "Stack: #{stack_name} doesn't exist, therefore it cannot be destroyed"
+        stack.resume_scaling_activities(stack_name)
         stack.delete
         while wait and stack.exists?
           sleep 20
@@ -77,6 +80,19 @@ module OpenDelivery
     def list
       @cfn.stacks.each do |stack|
         puts "Stack Name: #{stack.name} | Status: #{stack.status}"
+      end
+    end
+
+    def resume_scaling_activities(stack_name)
+      stack = @cfn.stacks[stack_name]
+      stack.resources.each do |resource|
+        if resource.resource_type == "AWS::AutoScaling::AutoScalingGroup"
+          begin
+            @autoscaling.groups[resource.physical_resource_id].resume_all_processes
+          rescue Exception => e
+            puts "ASG operation failed with [#{e.message}]"
+          end
+        end
       end
     end
 
