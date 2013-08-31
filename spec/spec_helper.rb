@@ -6,4 +6,5 @@ end
 
 require 'aws-sdk'
 require File.expand_path('../../lib/opendelivery/domain.rb', __FILE__)
+require File.expand_path('../../lib/opendelivery/stack.rb', __FILE__)
 load File.expand_path("/opt/aws/aws.config")
