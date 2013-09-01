@@ -24,7 +24,12 @@ AWS.config(
 
 ## Install Ruby and its dependencies
 
-Install ruby 1.9.3
+1. ```yum -y install ruby19```
+
+## Install Opendelivery gem
+
+1. ```gem install opendelivery```
+or add it to your gemfile
 
 ## LICENSE
 
