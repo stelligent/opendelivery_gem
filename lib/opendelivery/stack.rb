@@ -47,22 +47,16 @@ module OpenDelivery
     end
 
 
-    def create(stack_name, template, parameters = {}, wait=false, domain=nil)
+    def create(stack_name, template, parameters = {}, wait?=false, domain=nil)
       stack = @cfn.stacks.create(stack_name,
         File.open(template, "r").read,
         :parameters => parameters,
         :capabilities => ["CAPABILITY_IAM"],
         :disable_rollback => true)
 
-      if wait
-        wait_for_stack(stack)
-      end
+      wait_for_stack(stack, wait?)
 
-      unless domain.nil?
-        stack.resources.each do |resource|
-          @domain.set_property(domain, stack_name, resource.resource_type, resource.physical_resource_id)
-        end
-      end
+      @domain.load_stack_properties(domain, stack)
     end
 
     def destroy(stack_name, domain=nil, wait=false)
@@ -98,12 +92,14 @@ module OpenDelivery
 
     protected
 
-    def wait_for_stack(stack)
-      while stack.status != "CREATE_COMPLETE"
-        sleep 20
+    def wait_for_stack(stack, wait?)
+      if wait?
+        while stack.status != "CREATE_COMPLETE"
+          sleep 20
 
-        if FAILURE_STATUSES.include? stack.status
-          stack.delete
+          if FAILURE_STATUSES.include? stack.status
+            stack.delete
+          end
         end
       end
     end

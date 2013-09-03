@@ -29,6 +29,12 @@ module OpenDelivery
       end
     end
 
+    def load_stack_properties(domain, stack)
+      stack.resources.each do |resource|
+        set_property(domain, stack.name, resource.resource_type, resource.physical_resource_id)
+      end
+    end
+
     def get_property(domain, item_name, key)
       AWS::SimpleDB.consistent_reads do
         item = @sdb.domains[domain].items[item_name]
