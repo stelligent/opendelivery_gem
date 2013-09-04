@@ -47,14 +47,14 @@ module OpenDelivery
     end
 
 
-    def create(stack_name, template, parameters = {}, wait?=false, domain=nil)
+    def create(stack_name, template, parameters = {}, wait=false, domain=nil)
       stack = @cfn.stacks.create(stack_name,
         File.open(template, "r").read,
         :parameters => parameters,
         :capabilities => ["CAPABILITY_IAM"],
         :disable_rollback => true)
 
-      wait_for_stack(stack, wait?)
+      wait_for_stack(stack, wait)
 
       @domain.load_stack_properties(domain, stack)
     end
@@ -92,8 +92,8 @@ module OpenDelivery
 
     protected
 
-    def wait_for_stack(stack, wait?)
-      if wait?
+    def wait_for_stack(stack, wait)
+      if wait
         while stack.status != "CREATE_COMPLETE"
           sleep 20
 
