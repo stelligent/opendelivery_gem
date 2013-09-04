@@ -17,10 +17,12 @@ Since you will be using [AWS EC2](https://console.aws.amazon.com/ec2/) to instal
 
 ## Create your AWS Config file
 
+```
 AWS.config(
 :access_key_id => "AKIAISHDASD7MBC7fHA",
 :secret_access_key => "vEUt0O/UZkDDC2sa/44wAaZ7uHASDASDbStfgujiInFF",
 :region => "us-west-1")
+```
 
 ## Install Ruby and its dependencies
 
