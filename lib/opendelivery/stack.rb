@@ -61,13 +61,15 @@ module OpenDelivery
 
     def destroy(stack_name, domain=nil, wait=false)
       stack = @cfn.stacks[stack_name]
-      unless stack.exists? raise "Stack: #{stack_name} doesn't exist, therefore it cannot be destroyed"
+      if stack.exists?
         stack.resume_scaling_activities(stack_name)
         stack.delete
         while wait and stack.exists?
           sleep 20
         end
         @domain.destroy_item(domain, stack_name)
+      else
+        raise "Stack: #{stack_name} doesn't exist, therefore it cannot be destroyed"
       end
     end
 
