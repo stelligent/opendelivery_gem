@@ -3,7 +3,7 @@ require 'rake'
 spec = Gem::Specification.new do |s|
   s.name          = 'opendelivery'
   s.license       = 'MIT'
-  s.version       = '0.0.17'
+  s.version       = '0.0.18'
   s.author        = [ "Brian Jakovich", "Jonny Sywulak", "Stelligent" ]
   s.email         = 'brian.jakovich@stelligent.com'
   s.homepage      = 'http://stelligent.com'
