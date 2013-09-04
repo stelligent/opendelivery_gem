@@ -1,26 +1,7 @@
-opendelivery_gem
-================
-
-Ruby Gem for OpenDelivery. For information on our feature roadmap, go to the [Roadmap](https://github.com/stelligent/opendelivery_gem/blob/master/ROADMAP.md)
-
-==============
-
-## Description
-
-OpenDelivery gem lets you interact with the open delivery components for orchestrating your software delivery using the Open Delivery platform.
-
-While Ruby can be installed on many operating systems, we've included detailed instructions for installing on an AWS linux instance. With minor alterations, you can run these instructions for other operating systems.
-
-## Configuration of AWS Linux instance
-
-Since you will be using [AWS EC2](https://console.aws.amazon.com/ec2/) to install AWS.
-
-## Create your AWS Config file
-
-AWS.config(
+```AWS.config(
 :access_key_id => "AKIAISHDASD7MBC7fHA",
 :secret_access_key => "vEUt0O/UZkDDC2sa/44wAaZ7uHASDASDbStfgujiInFF",
-:region => "us-west-1")
+:region => "us-west-1")```
 
 ## Install Ruby and its dependencies
 
