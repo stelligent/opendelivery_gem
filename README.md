@@ -13,7 +13,17 @@ While Ruby can be installed on many operating systems, we've included detailed i
 
 ## Configuration of AWS Linux instance
 
-Since you will be using [AWS EC2](https://console.aws.amazon.com/ec2/) to install AWS.
+Since you will be using [AWS EC2](https://console.aws.amazon.com/ec2/) to install AWS. You'll need to create an instance using the AWS linux instance. The AMI ID to use is:
+
+```
+us-east-1: ami-05355a6c
+us-west-1: ami-951945d0
+us-west-2: ami-16fd7026
+eu-west-1: ami-24506250
+sa-east-1: ami-3e3be423
+ap-southeast-1: ami-74dda626
+ap-northeast-1: ami-dcfa4edd
+```
 
 ## Create your AWS Config file
 
