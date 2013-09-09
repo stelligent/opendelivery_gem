@@ -25,6 +25,8 @@ ap-southeast-1: ami-74dda626
 ap-northeast-1: ami-dcfa4edd
 ```
 
+Just launch an instance using the given AMI.
+
 ## Create your AWS Config file
 
 ```
@@ -42,6 +44,10 @@ AWS.config(
 
 1. ```gem install opendelivery```
 or add it to your gemfile
+
+## Require the gem
+Inside your ruby script just require the opendelivery gem
+```require 'opendelivery'```
 
 ## LICENSE
 
