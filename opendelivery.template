@@ -1,7 +1,7 @@
 {
   "AWSTemplateFormatVersion" : "2010-09-09",
 
-  "Description" : "AWS CloudFormation Template to configure chef on an EC2 Instance",
+  "Description" : "AWS CloudFormation Template to install the OpenDelivery Gem",
 
   "Parameters" : {
     "KeyName" : {
