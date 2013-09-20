@@ -53,10 +53,6 @@ module OpenDelivery
         :parameters => parameters,
         :capabilities => ["CAPABILITY_IAM"],
         :disable_rollback => true)
-
-      wait_for_stack(stack, wait)
-
-      @domain.load_stack_properties(domain, stack)
     end
 
     def destroy(stack_name, domain=nil, wait=false)
