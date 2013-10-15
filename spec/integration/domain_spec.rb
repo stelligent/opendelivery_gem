@@ -91,17 +91,24 @@ describe OpenDelivery::Domain do
         @item_name = "item_name"
         @key = "test_key_1"
         @expected_value = "test_value_1"
+        @expected_value2 = "test_value_2"
 
         AWS::SimpleDB.consistent_reads do
           @sdb.domains.create(@domain_name)
         end
 
-        @sdb.domains[@domain_name].items.create(@item_name, { @key => @expected_value } )
+        @sdb.domains[@domain_name].items.create(@item_name, { @key => [@expected_value, @expected_value2] } )
       end
 
       it "should return the proper value for the specified key" do
         actual_value = @domain_under_test.get_property(@domain_name, @item_name, @key)
         actual_value.should eql @expected_value
+      end
+
+
+      it "should return the proper value for the specified key when giving an index" do
+        actual_value = @domain_under_test.get_property(@domain_name, @item_name, @key, 1)
+        actual_value.should eql @expected_value2
       end
 
     end
