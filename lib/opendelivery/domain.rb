@@ -35,10 +35,10 @@ module OpenDelivery
       end
     end
 
-    def get_property(domain, item_name, key)
+    def get_property(domain, item_name, key, index=0)
       AWS::SimpleDB.consistent_reads do
         item = @sdb.domains[domain].items[item_name]
-        property_value = item.attributes[key].values[0].chomp
+        property_value = item.attributes[key].values[index].chomp
       end
     end
 

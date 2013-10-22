@@ -102,7 +102,7 @@ module OpenDelivery
       end
     end
 
-    def print_status(status, silent)
+    def print_status(status, silent=false)
       timestamp = Time.now.strftime("%Y.%m.%d %H:%M:%S:%L")
       unless silent
         puts "#{timestamp}: #{status}"
