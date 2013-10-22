@@ -17,7 +17,7 @@ describe OpenDelivery::Domain do
     end
 
     describe "Delete domain" do
-      it "should be able to create a domain in another region" do
+      it "should be able to delete a domain in another region" do
 
         AWS::SimpleDB.consistent_reads do
           @sdb.domains.create(@domain_name)
@@ -78,6 +78,8 @@ describe OpenDelivery::Domain do
 
       it "should destroy the item" do
         @domain_under_test.destroy_item(@domain_name, @item_name)
+        # Sleep briefly because sometimes this fails.
+        sleep 0.5
         AWS::SimpleDB.consistent_reads do
           @sdb.domains[@domain_name].items.size.should eql 0
         end
@@ -111,6 +113,15 @@ describe OpenDelivery::Domain do
         actual_value.should eql @expected_value2
       end
 
+      it "should return the nil value for the missing key" do
+        actual_value = @domain_under_test.get_property(@domain_name, @item_name, "bad_key")
+        actual_value.should eql nil
+      end
+
+      it "should return the nil value for the missing item" do
+        actual_value = @domain_under_test.get_property(@domain_name, "bad_item", "bad_key")
+        actual_value.should eql nil
+      end
     end
 
     describe "set property" do
