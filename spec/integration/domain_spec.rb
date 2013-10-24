@@ -44,18 +44,17 @@ describe OpenDelivery::Domain do
         AWS::SimpleDB.consistent_reads do
           @sdb.domains.create(@domain_name)
         end
+        @filename = "temp.json"
+        File.open(@filename, 'w') {|f| f.write('{  "test": { "testFieldOne" : "testValueOne", "testFieldTwo" : [ "testValueTwoA", "testValueTwoB" ] }}') }
     end
 
 
     describe "Load Domain" do
       it "should load the json file entries into the domain" do
-        filename = "temp.json"
-        File.open(filename, 'w') {|f| f.write('{  "test": { "testFieldOne" : "testValueOne", "testFieldTwo" : [ "testValueTwoA", "testValueTwoB" ] }}') }
-        @domain_under_test.load_domain(@domain_name, filename)
+        @domain_under_test.load_domain(@domain_name, @filename)
 
         actual_value = @domain_under_test.get_property(@domain_name, "test", "testFieldOne")
         actual_value.should eql "testValueOne"
-
       end
     end
 
@@ -64,6 +63,9 @@ describe OpenDelivery::Domain do
       AWS::SimpleDB.consistent_reads do
         @sdb.domains[@domain_name].delete!
       end
+
+      if File.exists? @filename then File.delete @filename end
+
     end
   end
 
