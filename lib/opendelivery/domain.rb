@@ -58,5 +58,18 @@ module OpenDelivery
         item.attributes.set(key => [value])
       end
     end
+
+    def load_domain(domain, json_file)
+      json = File.read(json_file)
+      obj = JSON.parse(json)
+
+      obj.each do |item, attributes|
+        attributes.each do |key,value|
+          AWS::SimpleDB.consistent_reads do
+            @sdb.domains[domain].items[item].attributes.set(key => [value])
+          end
+        end
+      end
+    end
   end
 end
