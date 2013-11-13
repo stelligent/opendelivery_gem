@@ -29,12 +29,46 @@ describe OpenDelivery::Domain do
     end
 
     after(:each) do
-      puts "\n============= RUNNING THE AFTER BLOCK ================"
+      # puts "\n============= RUNNING THE AFTER BLOCK ================"
       AWS::SimpleDB.consistent_reads do
         @sdb.domains[@domain_name].delete!
       end
     end
   end
+
+  context "Load Domain" do
+    before(:each) do
+        @domain_name = "opendeliverytest-domain"
+        @domain_under_test = OpenDelivery::Domain.new("us-west-1")
+        @sdb = AWS::SimpleDB.new(:region => "us-west-1")
+        AWS::SimpleDB.consistent_reads do
+          @sdb.domains.create(@domain_name)
+        end
+        @filename = "temp.json"
+        File.open(@filename, 'w') {|f| f.write('{  "test": { "testFieldOne" : "testValueOne", "testFieldTwo" : [ "testValueTwoA", "testValueTwoB" ] }}') }
+    end
+
+
+    describe "Load Domain" do
+      it "should load the json file entries into the domain" do
+        @domain_under_test.load_domain(@domain_name, @filename)
+
+        actual_value = @domain_under_test.get_property(@domain_name, "test", "testFieldOne")
+        actual_value.should eql "testValueOne"
+      end
+    end
+
+
+    after(:each) do
+      AWS::SimpleDB.consistent_reads do
+        @sdb.domains[@domain_name].delete!
+      end
+
+      if File.exists? @filename then File.delete @filename end
+
+    end
+  end
+
 
   context "Not specifying region" do
 
@@ -161,7 +195,7 @@ describe OpenDelivery::Domain do
       end
     end
     after(:each) do
-      puts "\n============= RUNNING THE AFTER BLOCK ================"
+     # puts "\n============= RUNNING THE AFTER BLOCK ================"
       AWS::SimpleDB.consistent_reads do
         @sdb.domains[@domain_name].delete!
       end
