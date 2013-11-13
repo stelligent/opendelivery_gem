@@ -144,7 +144,9 @@ module OpenDelivery
           print_status(status, silent)
           sleep (sleep_time * 0.1)
         end
-        sleep(sleep_time)
+        if keep_watching
+          sleep(sleep_time)
+        end
       end
       return success
     end
