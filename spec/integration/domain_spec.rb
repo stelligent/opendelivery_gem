@@ -126,14 +126,19 @@ describe OpenDelivery::Domain do
       before(:each) do
         @item_name = "item_name"
         @key = "test_key_1"
+        @key2 = "test_key_2|blah"
+        @key3 = "test_key_2|blah2"
         @expected_value = "test_value_1"
         @expected_value2 = "test_value_2"
+        @expected_value3 = "test_value_3"
 
         AWS::SimpleDB.consistent_reads do
           @sdb.domains.create(@domain_name)
         end
 
         @sdb.domains[@domain_name].items.create(@item_name, { @key => [@expected_value, @expected_value2] } )
+        @sdb.domains[@domain_name].items.create(@item_name, { @key2 => [@expected_value2] } )
+        @sdb.domains[@domain_name].items.create(@item_name, { @key3 => [@expected_value3] } )
       end
 
       it "should return the proper value for the specified key" do
@@ -149,12 +154,23 @@ describe OpenDelivery::Domain do
 
       it "should return the nil value for the missing key" do
         actual_value = @domain_under_test.get_property(@domain_name, @item_name, "bad_key")
+        puts actual_value
         actual_value.should eql nil
       end
 
       it "should return the nil value for the missing item" do
         actual_value = @domain_under_test.get_property(@domain_name, "bad_item", "bad_key")
         actual_value.should eql nil
+      end
+
+      it "should find the property even with the blah" do
+        actual_value = @domain_under_test.get_property(@domain_name, @item_name, "test_key_2")
+        actual_value.should eql @expected_value2
+      end
+
+      it "should find the property even with the blah2" do
+        actual_value = @domain_under_test.get_property(@domain_name, @item_name, "test_key_2", 0, "blah2")
+        actual_value.should eql @expected_value3
       end
     end
 
