@@ -3,7 +3,7 @@ require 'rake'
 spec = Gem::Specification.new do |s|
   s.name          = 'opendelivery'
   s.license       = 'MIT'
-  s.version       = '0.1.25'
+  s.version       = '0.2.0'
   s.author        = [ "Brian Jakovich", "Jonny Sywulak", "Stelligent" ]
   s.email         = 'brian.jakovich@stelligent.com'
   s.homepage      = 'http://stelligent.com'
@@ -18,6 +18,8 @@ spec = Gem::Specification.new do |s|
   s.add_development_dependency('simplecov', '0.7.1')
   s.add_development_dependency('cucumber', '1.3.6')
   s.add_development_dependency('aws-sdk', '1.16.0')
+  s.add_development_dependency('encrypto_signo', '1.0.0')
+  s.add_runtime_dependency('encrypto_signo', '1.0.0')
   s.add_runtime_dependency('aws-sdk', '1.16.0')
   s.add_dependency('json')
 end

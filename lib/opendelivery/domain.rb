@@ -1,9 +1,12 @@
 require 'aws-sdk'
+require 'encrypto_signo'
 
 module OpenDelivery
   class Domain
 
-    def initialize(region=nil)
+    def initialize(region=nil, key_path=nil)
+      @key_path = File.read(key_path) unless key_path.nil?
+
       if region.nil?
         @sdb = AWS::SimpleDB.new
       else
@@ -37,11 +40,16 @@ module OpenDelivery
       end
     end
 
+    def get_encrypted_property(domain, item_name, key, index=0, name=nil)
+      value = get_property(domain, item_name, key, index, name)
+      decrypted_value = EncryptoSigno.decrypt(@key_path, value.chomp)
+    end
+
     # Look for AWS::Some:Type|MyItemName or just AWS::Some::Type.
 
     def get_property(domain, item_name, key, index=0, name=nil)
       property_value = nil
-      attribute = nil
+      attribute      = nil
 
       AWS::SimpleDB.consistent_reads do
         item = @sdb.domains[domain].items[item_name]
@@ -90,8 +98,14 @@ module OpenDelivery
       return property_value
     end
 
+    def set_encrypted_property(domain, item_name, key, value, name=nil)
+      encrypted_value = EncryptoSigno.encrypt(@key_path, value.chomp)
+      set_property(domain, item_name, key, encrypted_value, name)
+    end
+
     def set_property(domain, item_name, key, value, name=nil)
       if name then key = key + "|" + name end
+
       AWS::SimpleDB.consistent_reads do
         item = @sdb.domains[domain].items[item_name]
         item.attributes.set(key => [value])
