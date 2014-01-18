@@ -3,7 +3,7 @@ require 'rake'
 spec = Gem::Specification.new do |s|
   s.name          = 'opendelivery'
   s.license       = 'MIT'
-  s.version       = '0.2.0'
+  s.version       = '0.3.0'
   s.author        = [ "Brian Jakovich", "Jonny Sywulak", "Stelligent" ]
   s.email         = 'brian.jakovich@stelligent.com'
   s.homepage      = 'http://stelligent.com'
@@ -14,6 +14,7 @@ spec = Gem::Specification.new do |s|
 
   s.require_paths << 'lib'
   s.required_ruby_version = '>= 1.9.3'
+  s.add_development_dependency('rdoc')
   s.add_development_dependency('rspec', '2.14.1')
   s.add_development_dependency('simplecov', '0.7.1')
   s.add_development_dependency('cucumber', '1.3.6')

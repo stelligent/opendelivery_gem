@@ -17,15 +17,13 @@ module OpenDelivery
       end
     end
 
-    def create(domain, stack_name, type, key)
+    def create(domain, stack_name)
       instance_id = prep_instance(domain, stack_name)
       image = @ec2.images.create(
         instance_id: instance_id,
         name: image_name)
 
       wait_for_image(image)
-
-      @domain.set_property(domain, key, type, image.id)
     end
 
     protected
