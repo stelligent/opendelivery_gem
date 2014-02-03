@@ -51,7 +51,7 @@ Inside your ruby script just require the opendelivery gem
 
 ## LICENSE
 
-Copyright (c) 2013 Stelligent Systems LLC
+Copyright (c) 2014 Stelligent Systems LLC
 
 MIT LICENSE
 

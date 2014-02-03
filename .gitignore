@@ -1,6 +1,8 @@
 # because my mac keeps trying to commit these…
 .DS_Store
 .DS_Store?
+.idea
+
 
 vendor/*
 .bundle/*
