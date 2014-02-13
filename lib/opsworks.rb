@@ -88,10 +88,12 @@ module OpsWorks
     max_attempts = 250
     num_attempts = 0
 
-    response = opsworks_client.describe_deployments(:deployment_ids => deployment_ids)
     deployments_complete = false
-    unless deployments_complete
+    until deployments_complete
+      response = opsworks_client.describe_deployments(:deployment_ids => deployment_ids)
       deployments_complete = response[:deployments].inject(true) do |status, deployment|
+        puts "Deployment status: #{deployment[:status]}"
+
         if deployment[:status] == 'failed'
           raise 'deployment failed'
         end
