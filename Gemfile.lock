@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    opendelivery (0.2.0)
+    opendelivery (0.3.0)
       aws-sdk (= 1.16.0)
       encrypto_signo (= 1.0.0)
       json
