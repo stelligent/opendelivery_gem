@@ -79,15 +79,17 @@ module OpsWorks
   def launch_stack_in_order(stack_id, layers_by_order)
     opsworks_client = AWS::OpsWorks::Client::V20130218.new
 
-    layers_by_order.each do |layer_name|
+    layers_by_order.each do |layer_names|
+      layer_names.each do |layer_name|
 
-      response = opsworks_client.describe_layers( :stack_id => stack_id)
-      layer = response[:layers].find { |layer| layer[:shortname] == layer_name }
-      raise "layer #{layer_name} not found in stack: #{stack_id}" if layer.nil?
+        response = opsworks_client.describe_layers( :stack_id => stack_id)
+        layer = response[:layers].find { |layer| layer[:shortname] == layer_name }
+        raise "layer #{layer_name} not found in stack: #{stack_id}" if layer.nil?
 
-      response = opsworks_client.describe_instances( :layer_id => layer[:layer_id])
-      response[:instances].each do |instance|
-        opsworks_client.start_instance( :instance_id => instance[:instance_id])
+        response = opsworks_client.describe_instances( :layer_id => layer[:layer_id])
+        response[:instances].each do |instance|
+          opsworks_client.start_instance( :instance_id => instance[:instance_id])
+        end
       end
 
       wait_on_setup(stack_id)
