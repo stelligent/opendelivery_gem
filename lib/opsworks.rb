@@ -90,11 +90,11 @@ module OpsWorks
         response[:instances].each do |instance|
           opsworks_client.start_instance( :instance_id => instance[:instance_id])
         end
+
+        wait_on_layer_setup(layer[:layer_id])
+
+        wait_on_layer_configures(layer[:layer_id])
       end
-
-      wait_on_setup(stack_id)
-
-      wait_on_all_configures(stack_id)
     end
   end
 
@@ -201,6 +201,25 @@ module OpsWorks
     end
   end
 
+  def wait_on_layer_setup(layer_id)
+    opsworks_client = AWS::OpsWorks::Client::V20130218.new
+
+    setup_complete = false
+    until setup_complete
+      response = opsworks_client.describe_instances(:layer_id => layer_id)
+      setup_complete = response[:instances].inject(true) do |status, instance|
+        if failure(instance[:status])
+          raise 'setup failed'
+        end
+
+        instance_status(instance)
+
+        status and complete(instance[:status])
+      end
+      sleep 10
+    end
+  end
+
   def instance_status(instance)
     puts "Instance: #{instance[:instance_id]} has status #{instance[:status]}"
   end
@@ -212,6 +231,14 @@ module OpsWorks
   def wait_on_all_configures(stack_id)
     opsworks_client = AWS::OpsWorks::Client::V20130218.new
     response = opsworks_client.describe_instances(:stack_id => stack_id)
+    response[:instances].each do |instance|
+      wait_on_configure(instance[:instance_id])
+    end
+  end
+
+  def wait_on_layer_configures(layer_id)
+    opsworks_client = AWS::OpsWorks::Client::V20130218.new
+    response = opsworks_client.describe_instances(:layer_id => layer_id)
     response[:instances].each do |instance|
       wait_on_configure(instance[:instance_id])
     end
