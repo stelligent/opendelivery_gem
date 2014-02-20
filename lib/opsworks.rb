@@ -82,7 +82,7 @@ module OpsWorks
     layers_by_order.each do |layer_name|
 
       response = opsworks_client.describe_layers( :stack_id => stack_id)
-      layer = response[:layers].find { |layer| layer[:name] == layer_name }
+      layer = response[:layers].find { |layer| layer[:shortname] == layer_name }
       raise "layer #{layer_name} not found in stack: #{stack_id}" if layer.nil?
 
       response = opsworks_client.describe_instances( :layer_id => layer[:layer_id])
