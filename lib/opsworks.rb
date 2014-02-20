@@ -90,9 +90,14 @@ module OpsWorks
         response[:instances].each do |instance|
           opsworks_client.start_instance( :instance_id => instance[:instance_id])
         end
+      end
+
+      layer_names.each do |layer_name|
+        response = opsworks_client.describe_layers( :stack_id => stack_id)
+        layer = response[:layers].find { |layer| layer[:shortname] == layer_name }
+        raise "layer #{layer_name} not found in stack: #{stack_id}" if layer.nil?
 
         wait_on_layer_setup(layer[:layer_id])
-
         wait_on_layer_configures(layer[:layer_id])
       end
     end
