@@ -31,6 +31,13 @@ module OpsWorks
     stack_id
   end
 
+  def create_and_launch_stack_in_order(stack_description, layers_by_order)
+    stack_id = create_stack(stack_description)
+    launch_stack_in_order(stack_id, layers_by_order)
+    deploy_apps(stack_id)
+    stack_id
+  end
+
   def create_stack(stack_description)
     opsworks_client = AWS::OpsWorks::Client::V20130218.new
 
@@ -68,6 +75,26 @@ module OpsWorks
     wait_on_all_configures(stack_id)
   end
 
+
+  def launch_stack_in_order(stack_id, layers_by_order)
+    opsworks_client = AWS::OpsWorks::Client::V20130218.new
+
+    layers_by_order.each do |layer_name|
+
+      response = opsworks_client.describe_layers( :stack_id => stack_id)
+      layer = response[:layers].find { |layer| layer[:name] == layer_name }
+      raise "layer #{layer_name} not found in stack: #{stack_id}" if layer.nil?
+
+      response = opsworks_client.describe_instances( :layer_id => layer[:layer_id])
+      response[:instances].each do |instance|
+        opsworks_client.start_instance( :instance_id => instance[:instance_id])
+      end
+
+      wait_on_setup(stack_id)
+
+      wait_on_all_configures(stack_id)
+    end
+  end
 
   def deploy_apps(stack_id)
     deployment_ids = []
