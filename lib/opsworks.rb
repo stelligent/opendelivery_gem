@@ -262,7 +262,8 @@ module OpsWorks
       configure_status(configure_command)
 
       unless configure_command.nil?
-        if configure_command[:status] == 'successful'
+        #i guess just bail if superseded, waiting on configure events is somewhat dubious after seeing more complex stacks in action anyway!
+        if %w{successful superseded}.include? configure_command[:status]
           return
         elsif configure_command[:status] == 'failed'
           raise 'configure failed'
