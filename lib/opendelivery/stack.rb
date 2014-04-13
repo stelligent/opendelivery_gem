@@ -70,7 +70,7 @@ module OpenDelivery
 
 
     def create(stack_name, template, parameters = {}, wait=false, domain=nil)
-      stack = @cfn.stacks.create(stack_name,
+      @cfn.stacks.create(stack_name,
         File.open(template, "r").read,
         :parameters => parameters,
         :capabilities => ["CAPABILITY_IAM"],
@@ -164,7 +164,7 @@ module OpenDelivery
         rescue AWS::CloudFormation::Errors::Throttling
           status = "Rate limit exceeded, retrying..."
           print_status(status, silent)
-          sleep (sleep_time * 0.1)
+          sleep(sleep_time * 0.1)
         end
         if keep_watching
           sleep(sleep_time)
