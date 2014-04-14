@@ -8,3 +8,5 @@ vendor/*
 .bundle/*
 coverage/*
 doc/*
+Gemfile.lock
+
