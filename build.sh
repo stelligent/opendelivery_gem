@@ -14,4 +14,4 @@ find . -name *.rb | xargs -n1 ruby -c > /dev/null
 # Prep and run unit tests
 gem install bundler
 bundle install
-bundle exec rspec spec/ -f d
+bundle exec rspec spec/ -f d --tag ~slow

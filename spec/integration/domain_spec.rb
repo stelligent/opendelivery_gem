@@ -2,7 +2,7 @@ require File.expand_path('../../spec_helper', __FILE__)
 
 describe OpenDelivery::Domain do
 
-  context "Specifying region" do
+  context "Specifying region", slow: true do
     before(:each) do
       @domain_name = "opendeliverytest_domain_1"
       @domain_under_test = OpenDelivery::Domain.new("us-west-1")
@@ -36,7 +36,7 @@ describe OpenDelivery::Domain do
     end
   end
 
-  context "Load Domain" do
+  context "Load Domain", slow: true do
     before(:each) do
       @domain_name = "opendeliverytest-domain"
       @domain_under_test = OpenDelivery::Domain.new("us-west-1")
@@ -72,7 +72,7 @@ describe OpenDelivery::Domain do
   end
 
 
-  context "Not specifying region" do
+  context "Not specifying region", slow: true do
 
     before(:each) do
       @domain_name = "opendeliverytest_domain_2"
