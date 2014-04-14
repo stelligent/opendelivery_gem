@@ -164,7 +164,6 @@ describe OpenDelivery::Domain do
 
       it "should return the nil value for the missing key" do
         actual_value = @domain_under_test.get_property(@domain_name, @item_name, "bad_key")
-        puts actual_value
         actual_value.should eql nil
       end
 
