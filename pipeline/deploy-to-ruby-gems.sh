@@ -1,3 +1,5 @@
+#!/bin/bash -e
+
 echo checking out revision $SHA
 git checkout $SHA
 
