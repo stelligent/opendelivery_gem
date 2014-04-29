@@ -1,6 +1,7 @@
 pipelines = []
 
-pipelines.add(["acceptance", "commit", "trigger", "clean-gemset", "deploy-to-ruby-gems"])
+pipelines.add(["trigger", "commit", "acceptance"])
+pipelines.add(["deploy-to-ruby-gems"])
 pipelines.each { jobs ->
 for (i = 0; i < jobs.size; ++ i) {
     job {
