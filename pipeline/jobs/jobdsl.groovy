@@ -7,7 +7,7 @@ for (i = 0; i < jobs.size; ++ i) {
     job {
         name "${jobs[i]}-dsl"
         scm {
-            git("https://github.com/stelligent/honolulu_answers.git", "master") { node ->
+            git("https://github.com/stelligent/opendelivery_gem.git", "master") { node ->
                 node / skipTag << "true"
             }
         }
