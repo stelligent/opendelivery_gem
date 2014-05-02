@@ -44,6 +44,8 @@ module OpsWorks
     response = opsworks_client.create_stack(stack_description.stack_description)
     stack_id = response[:stack_id]
 
+    wait_on_opsworks_sg_creation(stack_description.stack_description[:vpc_id]) if stack_description.stack_description[:vpc_id]
+
     stack_description.layer_descriptions.each do |layer_description|
       layer_description[:layer][:stack_id] = stack_id
 
@@ -164,6 +166,19 @@ module OpsWorks
   end
 
   private
+
+  def wait_on_opsworks_sg_creation(vpc_id)
+    opsworks_security_group_names.each do |sg_name|
+      while AWS.ec2.security_groups.filter('vpc-id', vpc_id).filter('group-name', sg_name).count == 0
+        puts "Waiting on #{sg_name}, #{a = a ? a+1 : 1}"
+        sleep 1
+      end
+    end
+  end
+
+  def opsworks_security_group_names
+    %w{AWS-OpsWorks-Default-Server AWS-OpsWorks-Blank-Server AWS-OpsWorks-Custom-Server AWS-OpsWorks-Rails-App-Server}
+  end
 
   def deployment_args_factory(app)
     if app[:type] == 'rails'
