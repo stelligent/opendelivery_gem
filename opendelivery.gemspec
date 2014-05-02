@@ -18,6 +18,7 @@ spec = Gem::Specification.new do |s|
   s.add_development_dependency('rspec', '2.14.1')
   s.add_development_dependency('simplecov', '0.7.1')
   s.add_development_dependency('cucumber', '1.3.6')
+  s.add_development_dependency('net-ssh', '2.9.0')
   s.add_runtime_dependency('encrypto_signo', '1.0.0')
   s.add_runtime_dependency('aws-sdk', '1.35.0')
   s.add_dependency('json', '~> 1.8')
