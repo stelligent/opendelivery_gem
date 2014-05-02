@@ -28,10 +28,6 @@ def create_view(pipeline, triggerjob) {
   }
 }
 
-pipelines.add(["trigger", "commit", "acceptance"])
-pipelines.add(["deploy-to-ruby-gems"])
-
-
 def pipelines =  [
   "Continuous Delivery Pipeline":[
     "commit":["trigger", "commit"], 
