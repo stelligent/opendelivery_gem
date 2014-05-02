@@ -11,7 +11,6 @@ Feature: Scripted install of Jenkins
         When I run "ls /var/lib/jenkins/jobs"
         Then I should see <jobname>
         When I inspect the config for <jobname>
-        Then I should see multiscm configured for that job
         Then I should see emails turned on for that job
         Then I should see that the build step is run in an RVM managed environment
         Then I should see that each job has Delivery Pipeline configuration
