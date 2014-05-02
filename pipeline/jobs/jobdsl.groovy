@@ -81,7 +81,7 @@ pipelines.each { pipeline, stages ->
         }
       }
       wrappers {
-        rvm("1.9.3")
+        rvm("2.0.0")
       }
       publishers {
         extendedEmail("jonny@stelligent.com", "\$PROJECT_NAME - Build # \$BUILD_NUMBER - \$BUILD_STATUS!", """\$PROJECT_NAME - Build # \$BUILD_NUMBER - \$BUILD_STATUS:
