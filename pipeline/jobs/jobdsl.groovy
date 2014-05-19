@@ -46,7 +46,7 @@ pipelines.each { pipeline, stages ->
     def joblist = []
     stages.each { stage, jobs ->
       jobs.each { job ->
-        joblist.add(["opendelivery_gem-" + job, stage])
+        joblist.add([job, stage])
       }
     }
     
@@ -58,7 +58,7 @@ pipelines.each { pipeline, stages ->
     job {  
       println "configuring ${jobName}'s pipeline config: ${jobName} / ${stage}"
       configure pipelineConfig(jobName, stage)
-      name "${jobName}-dsl"
+      name "opendelivery_gem-${jobName}-dsl"
       multiscm {
         git("https://github.com/stelligent/opendelivery_gem.git", "master") { node ->
           node / skipTag << "true"
@@ -73,7 +73,7 @@ pipelines.each { pipeline, stages ->
         shell("pipeline/${jobName}.sh")
         if (nextJobName != null) {
           downstreamParameterized {
-            trigger ("${nextJobName}-dsl", "ALWAYS"){
+            trigger ("opendelivery_gem-${nextJobName}-dsl", "ALWAYS"){
               currentBuild()
               propertiesFile("environment.txt")
             }
