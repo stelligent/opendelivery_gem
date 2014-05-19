@@ -46,7 +46,7 @@ pipelines.each { pipeline, stages ->
     def joblist = []
     stages.each { stage, jobs ->
       jobs.each { job ->
-        joblist.add(["opendelivery_gem" + job, stage])
+        joblist.add(["opendelivery_gem-" + job, stage])
       }
     }
     
