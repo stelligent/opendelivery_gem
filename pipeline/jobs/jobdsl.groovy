@@ -29,11 +29,11 @@ def create_view(pipeline, triggerjob) {
 }
 
 def pipelines =  [
-  "Continuous Delivery Pipeline":[
+  "Open Delivery Gem Continuous Delivery Pipeline":[
     "commit":["trigger", "commit"], 
     "acceptance": ["acceptance"]
     ],
-  "Production Delivery Pipeline":[
+  "Open Delivery Gem Production Delivery Pipeline":[
     "production" : ["deploy-to-ruby-gems"]
     ]
   ]
