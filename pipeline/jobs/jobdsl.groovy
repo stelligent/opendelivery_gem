@@ -23,7 +23,7 @@ def create_view(pipeline, triggerjob) {
       (view / 'showChanges').setValue("false")
       (view / 'showAggregatedPipeline').setValue("false")
       (view / 'componentSpecs' / 'se.diabol.jenkins.pipeline.DeliveryPipelineView_-ComponentSpec' / 'name').setValue(pipeline)
-      (view / 'componentSpecs' / 'se.diabol.jenkins.pipeline.DeliveryPipelineView_-ComponentSpec' / 'firstJob').setValue("${triggerjob}-dsl")
+      (view / 'componentSpecs' / 'se.diabol.jenkins.pipeline.DeliveryPipelineView_-ComponentSpec' / 'firstJob').setValue("opendelivery_gem-$${triggerjob}-dsl")
     }
   }
 }
