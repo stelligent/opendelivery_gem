@@ -70,7 +70,7 @@ module OpsWorks
       layer_description[:instances].each do |instance_description|
         if instance_description[:extra_layers]
           instance_description[:extra_layers].each do |extra_layer_name|
-            found_extra_layer = layer_descriptions.find { |desc| desc[:name] == extra_layer_name }
+            found_extra_layer = layer_descriptions.find { |desc| desc[:layer][:name] == extra_layer_name }
 
             raise "missing extra layer: #{extra_layer_name}" unless found_extra_layer
             instance_description[:layer_ids] << found_extra_layer[:layer_id]
