@@ -59,7 +59,7 @@ module OpsWorks
         instance_description[:layer_ids] = [layer_id]
 
         save_off = instance_description[:extra_layers]
-        instance_description.delete :extra_layers]
+        instance_description.delete :extra_layers
         response = opsworks_client.create_instance(instance_description)
         instance_description[:instance_id] = response[:instance_id]
         instance_description[:extra_layers] = save_off
