@@ -73,7 +73,7 @@ module OpsWorks
             found_extra_layer = layer_descriptions.find { |desc| desc[:layer][:name] == extra_layer_name }
 
             raise "missing extra layer: #{extra_layer_name}" unless found_extra_layer
-            instance_description[:layer_ids] << found_extra_layer[:layer_id]
+            instance_description[:layer_ids] << found_extra_layer[:layer][:layer_id]
             response = opsworks_client.update_instance(:instance_id => instance_description[:instance_id],
                                                        :layer_ids => instance_description[:layer_ids])
           end
