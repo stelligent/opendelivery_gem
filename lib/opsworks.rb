@@ -46,16 +46,34 @@ module OpsWorks
 
     wait_on_opsworks_sg_creation(stack_description.stack_description[:vpc_id]) if stack_description.stack_description[:vpc_id]
 
-    stack_description.layer_descriptions.each do |layer_description|
+    layer_descriptions = stack_description.layer_descriptions
+    layer_descriptions.each do |layer_description|
       layer_description[:layer][:stack_id] = stack_id
 
       response = opsworks_client.create_layer(layer_description[:layer])
       layer_id = response[:layer_id]
+      layer_description[:layer][:layer_id] = layer_id
 
       layer_description[:instances].each do |instance_description|
         instance_description[:stack_id] = stack_id
         instance_description[:layer_ids] = [layer_id]
         response = opsworks_client.create_instance(instance_description)
+        instance_description[:instance_id] = response[:instance_id]
+      end
+    end
+
+    layer_descriptions.each do |layer_description|
+      layer_description[:instances].each do |instance_description|
+        if instance_description[:extra_layers]
+          instance_description[:extra_layers].each do |extra_layer_name|
+            found_extra_layer = layer_descriptions.find { |desc| desc[:name] == extra_layer_name }
+
+            raise "missing extra layer: #{extra_layer_name}" unless found_extra_layer
+            instance_description[:layer_ids] << found_extra_layer[:layer_id]
+            response = opsworks_client.update_instance(:instance_id => instance_description[:instance_id],
+                                                       :layer_ids => instance_description[:layer_ids])
+          end
+        end
       end
     end
 
