@@ -20,7 +20,7 @@ spec = Gem::Specification.new do |s|
   s.add_development_dependency('cucumber', '1.3.6')
   s.add_development_dependency('net-ssh', '2.9.0')
   s.add_runtime_dependency('encrypto_signo', '1.0.0')
-  s.add_runtime_dependency('aws-sdk', '1.35.0')
-  s.add_runtime_dependency('aws-sdk-core', '2.0.0.rc2')
+  s.add_runtime_dependency('aws-sdk', '~> 1.0')
+  s.add_runtime_dependency('aws-sdk-core', '~> 2.0.0')
   s.add_dependency('json', '~> 1.8')
 end
