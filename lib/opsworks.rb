@@ -187,6 +187,18 @@ module OpsWorks
     response[:instances].collect { |instance| instance[:public_ip] }
   end
 
+  protected
+
+  def deployment_args_factory(app)
+    if app[:type] == 'rails'
+      {
+        'migrate' => %w{true}
+      }
+    else
+      {}
+    end
+  end
+
   private
 
   def wait_on_opsworks_sg_creation(vpc_id)
@@ -202,15 +214,6 @@ module OpsWorks
     %w{AWS-OpsWorks-Default-Server AWS-OpsWorks-Blank-Server AWS-OpsWorks-Custom-Server AWS-OpsWorks-Rails-App-Server}
   end
 
-  def deployment_args_factory(app)
-    if app[:type] == 'rails'
-      {
-        'migrate' => %w{true}
-      }
-    else
-      {}
-    end
-  end
 
   def complete(status)
     failure(status) or success(status)
