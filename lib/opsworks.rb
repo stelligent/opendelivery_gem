@@ -211,7 +211,7 @@ module OpsWorks
   end
 
   def opsworks_security_group_names
-    %w{AWS-OpsWorks-Default-Server AWS-OpsWorks-Blank-Server AWS-OpsWorks-Custom-Server AWS-OpsWorks-Rails-App-Server}
+    %w{AWS-OpsWorks-Default-Server AWS-OpsWorks-Blank-Server AWS-OpsWorks-Custom-Server AWS-OpsWorks-Rails-App-Server AWS-OpsWorks-PHP-App-Server}
   end
 
 
