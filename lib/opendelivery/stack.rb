@@ -69,10 +69,11 @@ module OpenDelivery
     end
 
 
-    def create(stack_name, template, parameters = {}, wait=false, domain=nil)
+    def create(stack_name, template, parameters = {}, wait=false, domain=nil, tags = {})
       @cfn.stacks.create(stack_name,
         File.open(template, "r").read,
         :parameters => parameters,
+        :tags => tags,
         :capabilities => ["CAPABILITY_IAM"],
         :disable_rollback => true)
     end
