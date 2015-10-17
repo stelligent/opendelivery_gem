@@ -2,9 +2,8 @@ deployment:
   rubygems:
     branch: master
     commands:
-      - which gem
-      - whoami
-      - gem list
+      - git config --global user.email "build@build.com"
+      - git config --global user.name "build"
       - gem install gem-release
       - "echo :rubygems_api_key: ${rubygems_api_key} > ~/.gem/credentials"
       - gem bump --version patch --tag
