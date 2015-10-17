@@ -1,0 +1,8 @@
+deployment:
+  production:
+    branch: master
+    commands:
+      - echo ":rubygems_api_key: ${rubygems_api_key}" > ~/.gem/credentials
+      - gem bump --version patch --tag
+      - gem build opendelivery.gemspec
+      - gem push opendelivery-*.gem
