@@ -1,10 +1,8 @@
 deployment:
-  production:
+  rubygems:
     branch: master
     commands:
-      lay_down_rubygems_creds: >
-                             echo ":rubygems_api_key: ${rubygems_api_key}" > ~/.gem/credentials
-      bump_gem_version: gem bump --version patch --tag
-      build_gem: gem build opendelivery.gemspec
-      push_gem_to_rubygems: >
-                          gem push opendelivery-*.gem
+      - "echo :rubygems_api_key: ${rubygems_api_key} > ~/.gem/credentials"
+      - gem bump --version patch --tag
+      - gem build opendelivery.gemspec
+      - "gem push opendelivery-*.gem"
