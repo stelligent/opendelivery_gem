@@ -1,9 +1,12 @@
 require 'rake'
 
-spec = Gem::Specification.new do |s|
+$:.unshift File.expand_path('../lib', __FILE__)
+require 'opendelivery/version'
+
+Gem::Specification.new do |s|
   s.name          = 'opendelivery'
   s.license       = 'MIT'
-  s.version       = '0.4.3'
+  s.version       = Opendelivery::VERSION
   s.author        = [ "Brian Jakovich", "Jonny Sywulak", "Stelligent" ]
   s.email         = 'brian.jakovich@stelligent.com'
   s.homepage      = 'http://stelligent.com'
