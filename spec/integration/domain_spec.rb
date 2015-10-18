@@ -65,7 +65,7 @@ describe OpenDelivery::Domain do
         actual_value = @domain_under_test.get_property(@domain_name, 'test', 'testFieldOne')
         actual_value.should eql 'testValueOne'
 
-        actual_value = @domain_under_test.get_property(@domain_name, 'test', 'testValueTwoA')
+        actual_value = @domain_under_test.get_property(@domain_name, 'test', 'testFieldTwo')
         actual_value.should eql 'testValueTwoA'
       end
     end
