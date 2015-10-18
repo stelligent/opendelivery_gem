@@ -111,6 +111,9 @@ describe OpenDelivery::Domain do
         end
 
         @sdb.domains[@domain_name].items.create(@item_name, { @key => @expected_value } )
+        until @sdb.domains[@domain_name].exists?
+          sleep 1
+        end
       end
 
       it "should destroy the item" do
