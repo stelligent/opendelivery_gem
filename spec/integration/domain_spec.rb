@@ -21,6 +21,9 @@ describe OpenDelivery::Domain do
 
         AWS::SimpleDB.consistent_reads do
           @sdb.domains.create(@domain_name)
+          until @sdb.domains[@domain_name].exists?
+            sleep 1
+          end
         end
 
         @domain_under_test.destroy(@domain_name)
@@ -45,6 +48,9 @@ describe OpenDelivery::Domain do
       @sdb = AWS::SimpleDB.new(:region => "us-west-1")
       AWS::SimpleDB.consistent_reads do
         @sdb.domains.create(@domain_name)
+        until @sdb.domains[@domain_name].exists?
+          sleep 1
+        end
       end
       @filename = "temp.json"
       File.open(@filename, 'w') {|f| f.write('{  "test": { "testFieldOne" : "testValueOne", "testFieldTwo" : [ "testValueTwoA", "testValueTwoB" ] }}') }
@@ -92,6 +98,9 @@ describe OpenDelivery::Domain do
 
         AWS::SimpleDB.consistent_reads do
           @sdb.domains.create(@domain_name)
+          until @sdb.domains[@domain_name].exists?
+            sleep 1
+          end
         end
 
         @domain_under_test.destroy(@domain_name)
@@ -108,12 +117,12 @@ describe OpenDelivery::Domain do
 
         AWS::SimpleDB.consistent_reads do
           @sdb.domains.create(@domain_name)
+          until @sdb.domains[@domain_name].exists?
+            sleep 1
+          end
         end
 
         @sdb.domains[@domain_name].items.create(@item_name, { @key => @expected_value } )
-        until @sdb.domains[@domain_name].exists?
-          sleep 1
-        end
       end
 
       it "should destroy the item" do
@@ -144,6 +153,9 @@ describe OpenDelivery::Domain do
 
         AWS::SimpleDB.consistent_reads do
           @sdb.domains.create(@domain_name)
+          until @sdb.domains[@domain_name].exists?
+            sleep 1
+          end
         end
 
         @sdb.domains[@domain_name].items.create(@item_name, { @key => [@expected_value, @expected_value2] } )
@@ -205,6 +217,9 @@ describe OpenDelivery::Domain do
 
         AWS::SimpleDB.consistent_reads do
           @sdb.domains.create(@domain_name)
+          until @sdb.domains[@domain_name].exists?
+            sleep 1
+          end
         end
       end
 
