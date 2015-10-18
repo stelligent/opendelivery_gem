@@ -4,8 +4,25 @@ deployment:
     commands:
       - git config --global user.email "build@build.com"
       - git config --global user.name "build"
-      - gem install gem-release
       - "echo :rubygems_api_key: ${rubygems_api_key} > ~/.gem/credentials"
-      - gem bump --version patch --tag
+
+      - >
+        current_version=$(ruby -e 'tags=`git tag -l v0\.4\.*`' \
+                               -e 'p tags.lines.map { |tag| tag.sub(/v0.4./, "").chomp.to_i }.max')
+        if [[ ${current_version} == nil ]];
+        then
+          new_version='0.4.4'
+        else
+          new_version=0.4.$((current_version+1))
+        fi
+        sed -i "s/0\.0\.0/${new_version}/g" opendelivery.gemspec
+        cat opendelivery.gemspec
+
+      - git tag v${new_version}
+      - git push --tags
+
       - gem build opendelivery.gemspec
       - "gem push opendelivery-*.gem"
+
+
+
