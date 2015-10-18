@@ -58,14 +58,14 @@ describe OpenDelivery::Domain do
     end
 
 
-    describe "Load Domain" do
-      it "should load the json file entries into the domain" do
+    describe 'Load Domain' do
+      it 'should load the json file entries into the domain' do
         @domain_under_test.load_domain(@domain_name, @filename)
 
-        actual_value = @domain_under_test.get_property(@domain_name, "test", "testFieldTwo")
-        actual_value.should eql "testValueOne"
+        actual_value = @domain_under_test.get_property(@domain_name, 'test', 'testFieldOne')
+        actual_value.should eql 'testValueOne'
 
-        actual_value = @domain_under_test.get_property(@domain_name, "test", 'testValueTwoA')
+        actual_value = @domain_under_test.get_property(@domain_name, 'test', 'testValueTwoA')
         actual_value.should eql 'testValueOne'
       end
     end

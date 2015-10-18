@@ -19,6 +19,9 @@ current_version=$(ruby -e 'tags=`git tag -l v0\.4\.*`' \
 
 if [[ ${current_version} == nil ]];
 then
+  #for issue scraping
+  current_version=origin
+
   new_version='0.4.4'
 else
   new_version=0.4.$((current_version+1))
@@ -27,7 +30,9 @@ fi
 sed -i "s/0\.0\.0/${new_version}/g" opendelivery.gemspec
 cat opendelivery.gemspec
 
-git tag v${new_version}
+issues=$(git log v${current_version}..${GIT_SHA} --oneline | awk '{print $2}' | grep ^\# | uniq)
+
+git tag -a v${new_version} -m "Issues with commits, not necessarily closed: ${issues}"
 
 git push --tags
 
