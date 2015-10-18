@@ -2,7 +2,7 @@ deployment:
   rubygems:
     branch: master
     commands:
-      - publish.sh
+      - ./publish.sh
 
 
 
