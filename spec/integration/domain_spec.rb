@@ -134,7 +134,9 @@ describe OpenDelivery::Domain do
         # Sleep briefly because sometimes this fails.
         sleep 0.5
         AWS::SimpleDB.consistent_reads do
-          @sdb.domains[@domain_name].items.size.should eql 0
+          domain = @sdb.domains[@domain_name]
+          items = domain.items
+          item.size.should eql 0
         end
       end
 
