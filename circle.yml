@@ -2,6 +2,7 @@ deployment:
   rubygems:
     branch: master
     commands:
+      - git status
       - ./publish.sh
 
 
