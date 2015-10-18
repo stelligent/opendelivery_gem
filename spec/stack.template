@@ -1,7 +1,0 @@
-{
-  "Resources": {
-    "CFNStelligentUser": {
-      "Type": "AWS::IAM::User"
-    }
-  }
-}

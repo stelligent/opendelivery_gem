@@ -20,7 +20,7 @@
 #OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 #THE SOFTWARE.
 
-require 'aws-sdk'
+require 'aws-sdk-core'
 require 'encrypto_signo'
 
 module OpenDelivery
@@ -30,108 +30,67 @@ module OpenDelivery
       @key_path = File.read(key_path) unless key_path.nil?
 
       if region.nil?
-        @sdb = AWS::SimpleDB.new
+        @sdb = Aws::SimpleDB::Client.new
       else
-        @sdb = AWS::SimpleDB.new(:region => region)
+        @sdb = Aws::SimpleDB::Client.new(:region => region)
       end
     end
 
     def create(domain)
-      AWS::SimpleDB.consistent_reads do
-        @sdb.domains.create(domain)
-      end
+      @sdb.create_domain(domain_name: domain)
     end
 
     def destroy(domain)
-      AWS::SimpleDB.consistent_reads do
-        @sdb.domains[domain].delete
-      end
+      @sdb.delete_domain(domain_name: domain)
     end
 
     def destroy_item(domain, item_name)
-      AWS::SimpleDB.consistent_reads do
-        @sdb.domains[domain].items[item_name].delete
-      end
+      @sdb.delete_attributes(domain_name: domain,
+                             item_name: item_name)
     end
 
     def load_stack_properties(domain, stack)
-      AWS::SimpleDB.consistent_reads do
-        stack.resources.each do |resource|
-          set_property(domain, stack.name, resource.resource_type, resource.physical_resource_id)
-        end
+      stack.resources.each do |resource|
+        set_property(domain,
+                     stack.name,
+                     resource.resource_type,
+                     resource.physical_resource_id)
       end
     end
 
-    def get_encrypted_property(domain, item_name, key, index=0, name=nil)
-      value = get_property(domain, item_name, key, index, name)
-      decrypted_value = EncryptoSigno.decrypt(@key_path, value.chomp)
+    def get_encrypted_property(domain, item_name, key)
+      value = get_property(domain, item_name, key)
+      EncryptoSigno.decrypt(@key_path, value.chomp)
     end
 
-    # Look for AWS::Some:Type|MyItemName or just AWS::Some::Type.
+    def get_property(domain, item_name, key)
+      get_attributes_response = @sdb.get_attributes(domain_name: domain,
+                                                    item_name: item_name,
+                                                    attribute_names: [key],
+                                                    consistent_read: true)
 
-    def get_property(domain, item_name, key, index=0, name=nil)
-      property_value = nil
-      attribute      = nil
-
-      AWS::SimpleDB.consistent_reads do
-        item = @sdb.domains[domain].items[item_name]
-        if !item.nil?
-          item.attributes.each do |att|
-            col_name = nil
-
-            att_array = att.name.split('|')
-            col_title = att_array.first
-
-            if att_array.length > 1
-              col_name = att_array[1]
-            end
-
-            if col_title == key
-              # Found a column with first portion that matches our search 'key'
-              # Now, determine if we need to match the "|name" name criteria.
-
-              if name.nil?
-                # Not given a name to search for, just return the first one
-                # we have found.
-                attribute = att
-                break
-              else
-
-                # Give a 'name' search criteria, so match it against this column
-                if name == col_name
-                  # 'name' criteria matches "|name" value, found a match
-                  attribute = att
-                  break
-                else
-                  # 'name' criteria did not match, keep searching
-                end
-
-              end
-            end
-          end
-          if !attribute.nil?
-            value = attribute.values[index]
-            if !value.nil?
-              property_value = value.chomp
-            end
-          end
-        end
+      if get_attributes_response.attributes.empty?
+        nil
+      else
+        get_attributes_response.attributes.first.value.chomp
       end
-      return property_value
     end
 
-    def set_encrypted_property(domain, item_name, key, value, name=nil)
+    def set_encrypted_property(domain, item_name, key, value)
       encrypted_value = EncryptoSigno.encrypt(@key_path, value.chomp)
-      set_property(domain, item_name, key, encrypted_value, name)
+      set_property(domain, item_name, key, encrypted_value)
     end
 
-    def set_property(domain, item_name, key, value, name=nil)
-      if name then key = key + "|" + name end
-
-      AWS::SimpleDB.consistent_reads do
-        item = @sdb.domains[domain].items[item_name]
-        item.attributes.set(key => [value])
-      end
+    def set_property(domain, item_name, key, value)
+      @sdb.put_attributes(domain_name: domain,
+                          item_name: item_name,
+                          attributes: [
+                            {
+                              name: key,
+                              value: value,
+                              replace: true,
+                            }
+                          ])
     end
 
     def load_domain(domain, json_file)
@@ -140,9 +99,15 @@ module OpenDelivery
 
       obj.each do |item, attributes|
         attributes.each do |key,value|
-          AWS::SimpleDB.consistent_reads do
-            @sdb.domains[domain].items[item].attributes.set(key => [value])
-          end
+          @sdb.put_attributes(domain_name: domain,
+                              item_name: item,
+                              attributes: [
+                                {
+                                  name: key,
+                                  value: value,
+                                  replace: true,
+                                }
+                              ])
         end
       end
     end
