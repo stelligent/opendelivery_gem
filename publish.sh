@@ -30,7 +30,7 @@ fi
 sed -i "s/0\.0\.0/${new_version}/g" opendelivery.gemspec
 cat opendelivery.gemspec
 
-issues=$(git log v${current_version}..${GIT_SHA} --oneline | awk '{print $2}' | grep ^\# | uniq)
+issues=$(git log v0.4.${current_version}..head --oneline | awk '{print $2}' | grep '^#' | uniq)
 
 git tag -a v${new_version} -m "Issues with commits, not necessarily closed: ${issues}"
 

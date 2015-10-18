@@ -3,22 +3,22 @@ require 'aws-sdk'
 
 describe OpenDelivery::Domain do
 
-  context "Specifying region", slow: true do
+  context 'Specifying region', slow: true do
     before(:each) do
-      @domain_name = "opendeliverytest_domain_1"
-      @domain_under_test = OpenDelivery::Domain.new("us-west-1")
-      @sdb = AWS::SimpleDB.new(:region => "us-west-1")
+      @domain_name = 'opendeliverytest_domain_1'
+      @domain_under_test = OpenDelivery::Domain.new('us-west-1')
+      @sdb = AWS::SimpleDB.new(:region => 'us-west-1')
     end
 
-    describe "create domain" do
-      it "should be able to create a domain in another region" do
+    describe 'create domain' do
+      it 'should be able to create a domain in another region' do
         @domain_under_test.create(@domain_name)
         @sdb.domains[@domain_name].exists?.should eql true
       end
     end
 
-    describe "Delete domain" do
-      it "should be able to delete a domain in another region" do
+    describe 'Delete domain' do
+      it 'should be able to delete a domain in another region' do
 
         AWS::SimpleDB.consistent_reads do
           @sdb.domains.create(@domain_name)
@@ -40,20 +40,20 @@ describe OpenDelivery::Domain do
     end
   end
 
-  context "Load Domain", slow: true do
+  context 'Load Domain', slow: true do
     before(:each) do
-      @domain_name = "opendeliverytest-domain"
-      @domain_under_test = OpenDelivery::Domain.new("us-west-1")
-      @encrypted_domain = OpenDelivery::Domain.new("us-west-1",'spec/private.pem')
+      @domain_name = 'opendeliverytest-domain'
+      @domain_under_test = OpenDelivery::Domain.new('us-west-1')
+      @encrypted_domain = OpenDelivery::Domain.new('us-west-1','spec/private.pem')
 
-      @sdb = AWS::SimpleDB.new(:region => "us-west-1")
+      @sdb = AWS::SimpleDB.new(:region => 'us-west-1')
       AWS::SimpleDB.consistent_reads do
         @sdb.domains.create(@domain_name)
         until @sdb.domains[@domain_name].exists?
           sleep 1
         end
       end
-      @filename = "temp.json"
+      @filename = 'temp.json'
       File.open(@filename, 'w') {|f| f.write('{  "test": { "testFieldOne" : "testValueOne", "testFieldTwo" : "testValueTwoA" }}') }
     end
 
@@ -82,23 +82,23 @@ describe OpenDelivery::Domain do
   end
 
 
-  context "Not specifying region", slow: true do
+  context 'Not specifying region', slow: true do
 
     before(:each) do
-      @domain_name = "opendeliverytest_domain_2"
+      @domain_name = 'opendeliverytest_domain_2'
       @domain_under_test = OpenDelivery::Domain.new
       @encrypted_domain = OpenDelivery::Domain.new(nil,'spec/private.pem')
       @sdb = AWS::SimpleDB.new
     end
 
-    describe "create domain" do
-      it "should be able to create a domain" do
+    describe 'create domain' do
+      it 'should be able to create a domain' do
         @domain_under_test.create(@domain_name)
       end
     end
 
-     describe "Delete domain" do
-      it "should be able to create a domain in another region" do
+     describe 'Delete domain' do
+      it 'should be able to create a domain in another region' do
 
         AWS::SimpleDB.consistent_reads do
           @sdb.domains.create(@domain_name)
@@ -112,12 +112,12 @@ describe OpenDelivery::Domain do
       end
     end
 
-    describe "destroy item" do
+    describe 'destroy item' do
 
       before(:each) do
-        @item_name = "item_name"
-        @key = "test_key_1"
-        @expected_value = "test_value_1"
+        @item_name = 'item_name'
+        @key = 'test_key_1'
+        @expected_value = 'test_value_1'
 
         AWS::SimpleDB.consistent_reads do
           @sdb.domains.create(@domain_name)
@@ -129,7 +129,7 @@ describe OpenDelivery::Domain do
         @sdb.domains[@domain_name].items.create(@item_name, { @key => @expected_value } )
       end
 
-      it "should destroy the item" do
+      it 'should destroy the item' do
         @domain_under_test.destroy_item(@domain_name, @item_name)
         # Sleep briefly because sometimes this fails.
         sleep 0.5
@@ -140,14 +140,14 @@ describe OpenDelivery::Domain do
 
     end
 
-    describe "get property" do
+    describe 'get property' do
 
       before(:each) do
-        @item_name = "item_name"
-        @key = "test_key_1"
-        @key4 = "test_key_4"
-        @expected_value = "test_value_1"
-        @expected_value4 = "test_value_4"
+        @item_name = 'item_name'
+        @key = 'test_key_1'
+        @key4 = 'test_key_4'
+        @expected_value = 'test_value_1'
+        @expected_value4 = 'test_value_4'
 
         AWS::SimpleDB.consistent_reads do
           @sdb.domains.create(@domain_name)
@@ -161,38 +161,38 @@ describe OpenDelivery::Domain do
 
       end
 
-      it "should return the proper value for the specified key" do
+      it 'should return the proper value for the specified key' do
         actual_value = @domain_under_test.get_property(@domain_name, @item_name, @key)
         actual_value.should eql @expected_value
       end
 
-      it "should return the nil value for the missing key" do
-        actual_value = @domain_under_test.get_property(@domain_name, @item_name, "bad_key")
+      it 'should return the nil value for the missing key' do
+        actual_value = @domain_under_test.get_property(@domain_name, @item_name, 'bad_key')
         actual_value.should eql nil
       end
 
-      it "should return the nil value for the missing item" do
-        actual_value = @domain_under_test.get_property(@domain_name, "bad_item", "bad_key")
+      it 'should return the nil value for the missing item' do
+        actual_value = @domain_under_test.get_property(@domain_name, 'bad_item', 'bad_key')
         actual_value.should eql nil
       end
 
-      it "should find a decrypted property" do
+      it 'should find a decrypted property' do
         actual_value = @encrypted_domain.get_encrypted_property(@domain_name, @item_name, @key4)
         actual_value.should eql @expected_value4
       end
 
-      it "should find an encrypted property" do
+      it 'should find an encrypted property' do
         actual_value = @encrypted_domain.get_property(@domain_name, @item_name, @key4)
         actual_value.should_not eql @expected_value4
       end
     end
 
-    describe "set property" do
+    describe 'set property' do
 
       before(:each) do
-        @item_name = "item_name"
-        @key = "test_key_1"
-        @expected_value = "test_value_1"
+        @item_name = 'item_name'
+        @key = 'test_key_1'
+        @expected_value = 'test_value_1'
 
         AWS::SimpleDB.consistent_reads do
           @sdb.domains.create(@domain_name)
@@ -202,7 +202,7 @@ describe OpenDelivery::Domain do
         end
       end
 
-      it "should set the specified value for the specified key" do
+      it 'should set the specified value for the specified key' do
         @domain_under_test.set_property(@domain_name, @item_name, @key, @expected_value)
 
         AWS::SimpleDB.consistent_reads do
@@ -211,7 +211,7 @@ describe OpenDelivery::Domain do
         end
       end
 
-      it "should set the value for the key to only a single value" do
+      it 'should set the value for the key to only a single value' do
         @domain_under_test.set_property(@domain_name, @item_name, @key, @expected_value)
         AWS::SimpleDB.consistent_reads do
           actual_value = @sdb.domains[@domain_name].items[@item_name].attributes[@key].values[0].chomp
