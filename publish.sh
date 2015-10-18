@@ -34,7 +34,11 @@ fi
 sed -i "s/0\.0\.0/${new_version}/g" opendelivery.gemspec
 cat opendelivery.gemspec
 
-issues=$(git log v0.4.${current_version}..head --oneline | awk '{print $2}' | grep '^#' | uniq)
+#on circle ci - head is ambiguous for reasons that i don't grok
+#we haven't made the new tag and we can't if we are going to annotate
+head=$(git log -n 1 --oneline | awk '{print $1}')
+
+issues=$(git log v0.4.${current_version}..${head} --oneline | awk '{print $2}' | grep '^#' | uniq)
 
 git tag -a v${new_version} -m "Issues with commits, not necessarily closed: ${issues}"
 
