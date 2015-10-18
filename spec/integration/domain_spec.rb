@@ -54,7 +54,7 @@ describe OpenDelivery::Domain do
         end
       end
       @filename = "temp.json"
-      File.open(@filename, 'w') {|f| f.write('{  "test": { "testFieldOne" : "testValueOne", "testFieldTwo" : [ "testValueTwoA", "testValueTwoB" ] }}') }
+      File.open(@filename, 'w') {|f| f.write('{  "test": { "testFieldOne" : "testValueOne", "testFieldTwo" : "testValueTwoA" }}') }
     end
 
 
@@ -62,8 +62,11 @@ describe OpenDelivery::Domain do
       it "should load the json file entries into the domain" do
         @domain_under_test.load_domain(@domain_name, @filename)
 
-        actual_value = @domain_under_test.get_property(@domain_name, "test", "testFieldOne")
+        actual_value = @domain_under_test.get_property(@domain_name, "test", "testFieldTwo")
         actual_value.should eql "testValueOne"
+
+        actual_value = @domain_under_test.get_property(@domain_name, "test", 'testValueTwoA')
+        actual_value.should eql 'testValueOne'
       end
     end
 
@@ -140,16 +143,10 @@ describe OpenDelivery::Domain do
     describe "get property" do
 
       before(:each) do
-
-
         @item_name = "item_name"
         @key = "test_key_1"
-        @key2 = "test_key_2|blah"
-        @key3 = "test_key_2|blah2"
         @key4 = "test_key_4"
         @expected_value = "test_value_1"
-        @expected_value2 = "test_value_2"
-        @expected_value3 = "test_value_3"
         @expected_value4 = "test_value_4"
 
         AWS::SimpleDB.consistent_reads do
@@ -159,10 +156,7 @@ describe OpenDelivery::Domain do
           end
         end
 
-        @sdb.domains[@domain_name].items.create(@item_name, { @key => [@expected_value, @expected_value2] } )
-        @sdb.domains[@domain_name].items.create(@item_name, { @key2 => [@expected_value2] } )
-        @sdb.domains[@domain_name].items.create(@item_name, { @key3 => [@expected_value3] } )
-
+        @sdb.domains[@domain_name].items.create(@item_name, { @key => @expected_value } )
         @encrypted_domain.set_encrypted_property(@domain_name, @item_name, @key4, @expected_value4)
 
       end
@@ -170,12 +164,6 @@ describe OpenDelivery::Domain do
       it "should return the proper value for the specified key" do
         actual_value = @domain_under_test.get_property(@domain_name, @item_name, @key)
         actual_value.should eql @expected_value
-      end
-
-
-      it "should return the proper value for the specified key when giving an index" do
-        actual_value = @domain_under_test.get_property(@domain_name, @item_name, @key, 1)
-        actual_value.should eql @expected_value2
       end
 
       it "should return the nil value for the missing key" do
@@ -186,16 +174,6 @@ describe OpenDelivery::Domain do
       it "should return the nil value for the missing item" do
         actual_value = @domain_under_test.get_property(@domain_name, "bad_item", "bad_key")
         actual_value.should eql nil
-      end
-
-      it "should find the property even with the blah" do
-        actual_value = @domain_under_test.get_property(@domain_name, @item_name, "test_key_2")
-        actual_value.should eql @expected_value2
-      end
-
-      it "should find the property even with the blah2" do
-        actual_value = @domain_under_test.get_property(@domain_name, @item_name, "test_key_2", 0, "blah2")
-        actual_value.should eql @expected_value3
       end
 
       it "should find a decrypted property" do
