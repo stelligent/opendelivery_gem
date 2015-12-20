@@ -1,6 +1,7 @@
 opendelivery_gem
 ================
-
+[![Circle CI](https://circleci.com/gh/stelligent/opendelivery_gem.svg?style=svg)](https://circleci.com/gh/stelligent/opendelivery_gem)
+================
 Ruby Gem for OpenDelivery. For information on our feature roadmap, go to the [Roadmap](https://github.com/stelligent/opendelivery_gem/blob/master/ROADMAP.md)
 
 ==============
