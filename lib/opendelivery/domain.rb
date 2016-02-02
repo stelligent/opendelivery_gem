@@ -75,7 +75,7 @@ module OpenDelivery
         get_attributes_response.attributes.first.value.chomp
       end
     end
-    
+
     def get_item_attributes_json(domain, item_name)
       get_attributes_response = @sdb.get_attributes(domain_name: domain,
                                                     item_name: item_name,
@@ -84,8 +84,8 @@ module OpenDelivery
       if get_attributes_response.attributes.empty?
         nil
       else
-        JSON.generate(get_attributes_response.attributes.map { |attribute| 
-          { name: attribute.name, value: attribute.value } 
+        JSON.generate(get_attributes_response.attributes.map { |attribute|
+          { name: attribute.name, value: attribute.value }
         })
       end
     end
