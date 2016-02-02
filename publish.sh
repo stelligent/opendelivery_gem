@@ -38,6 +38,7 @@ cat opendelivery.gemspec
 #we haven't made the new tag and we can't if we are going to annotate
 head=$(git log -n 1 --oneline | awk '{print $1}')
 
+echo "you need to start your commit messages with #x, where x is the issue number your commit resolves"
 issues=$(git log v0.4.${current_version}..${head} --oneline | awk '{print $2}' | grep '^#' | uniq)
 
 git tag -a v${new_version} -m "Issues with commits, not necessarily closed: ${issues}"
