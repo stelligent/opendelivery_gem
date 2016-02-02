@@ -189,6 +189,34 @@ describe OpenDelivery::Domain do
       end
     end
 
+    describe 'get item attributes' do
+
+      before(:each) do
+        @item_name = 'item_name'
+        @keys = { 'test_key_1': 'test_value_1', 'test_key_4': 'test_value_4' }
+        @expected_value = '[{"name":"test_key_4","value":"test_value_4"},{"name":"test_key_1","value":"test_value_1"}]'
+
+        AWS::SimpleDB.consistent_reads do
+          @sdb.domains.create(@domain_name)
+          until @sdb.domains[@domain_name].exists?
+            sleep 1
+          end
+        end
+
+        @sdb.domains[@domain_name].items.create(@item_name, @keys)
+      end
+
+      it 'should return the proper values for the specified item' do
+        actual_value = @domain_under_test.get_item_attributes_json(@domain_name, @item_name)
+        actual_value.should eql @expected_value
+      end
+
+      it 'should return the nil value for the missing item' do
+        actual_value = @domain_under_test.get_item_attributes_json(@domain_name, 'bad_item')
+        actual_value.should eql nil
+      end
+    end
+
     describe 'set property' do
 
       before(:each) do
