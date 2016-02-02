@@ -189,11 +189,11 @@ describe OpenDelivery::Domain do
       end
     end
 
-    describe 'get item attributes' do
+    describe 'get item attributes json' do
 
       before(:each) do
         @item_name = 'item_name'
-        @keys = { 'test_key_1': 'test_value_1', 'test_key_4': 'test_value_4' }
+        @keys = { 'test_key_1' => 'test_value_1', 'test_key_4' => 'test_value_4' }
         @expected_value = '[{"name":"test_key_4","value":"test_value_4"},{"name":"test_key_1","value":"test_value_1"}]'
 
         AWS::SimpleDB.consistent_reads do
