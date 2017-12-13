@@ -31,7 +31,7 @@ then
   new_version='0.5.0'
 else
   new_version=0.5.$((current_version+1))
-  current_version=$(v0.5.${current_version})
+  current_version=v0.5.${current_version}
 fi
 
 sed -i "s/0\.0\.0/${new_version}/g" opendelivery.gemspec
