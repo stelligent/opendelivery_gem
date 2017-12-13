@@ -1,265 +1,147 @@
 require File.expand_path('../../spec_helper', __FILE__)
-require 'aws-sdk'
 
 describe OpenDelivery::Domain do
+  let(:domain_name) { 'test-domain' }
+  let(:encrypted_hash) { "A3a2fG3S7AAe4n1uRtFGWi9cKsGuWRwjdmNz1z05nN7vpA6kSVfK0QzpT68b\ngv1pu7PczaNqLimhB3ZE3Qj/A4Bzka13ZFBawhhY+oXcWBc0RmeWgOaYJf0i\n7Y4MnieKYJ8xsy87YD9n0bWBPDcAPkUWT282VTlTEcz1u1TbIJzTJOsiTj6c\nYgxUY7lS9A9ZrIqrMMtTodq/A+zm1GYifJn1kTn2oOmj/NkwR0P6Sgj14Djg\nOH/TfktTDppNH3/RKQjJVSS6JTpW1RhCek9nHKiI3lUrqhyUV1MZ66Pzz0w7\n/lo/ETK9koBHtfqZBOHREGO3iD7iD1NcqYNIIz7ZyQ==\n|cG6CmVscfexgkBs54jYtrQ==\n" }
+  let(:simpledb) do
+    Aws::SimpleDB::Client.new(region: 'us-west-1', stub_responses: true)
+  end
+  let(:domain_under_test) do
+    od = OpenDelivery::Domain.new('us-west-1', 'spec/private.pem')
+    od.instance_variable_set(:@sdb, simpledb)
+    od
+  end
 
-  context 'Specifying region', slow: true do
-    before(:each) do
-      @domain_name = 'opendeliverytest_domain_1'
-      @domain_under_test = OpenDelivery::Domain.new('us-west-1')
-      @sdb = AWS::SimpleDB.new(:region => 'us-west-1')
-    end
-
-    describe 'create domain' do
-      it 'should be able to create a domain in another region' do
-        @domain_under_test.create(@domain_name)
-        @sdb.domains[@domain_name].exists?.should eql true
-      end
-    end
-
-    describe 'Delete domain' do
-      it 'should be able to delete a domain in another region' do
-
-        AWS::SimpleDB.consistent_reads do
-          @sdb.domains.create(@domain_name)
-          until @sdb.domains[@domain_name].exists?
-            sleep 1
-          end
-        end
-
-        @domain_under_test.destroy(@domain_name)
-        @sdb.domains[@domain_name].exists?.should eql false
-      end
-    end
-
-    after(:each) do
-      # puts "\n============= RUNNING THE AFTER BLOCK ================"
-      AWS::SimpleDB.consistent_reads do
-        @sdb.domains[@domain_name].delete!
+  describe '#create' do
+    context 'when passed a domain name' do
+      it 'creates a new domain' do
+        expect(simpledb).to receive(:create_domain).with(domain_name: domain_name)
+        domain_under_test.create(domain_name)
       end
     end
   end
 
-  context 'Load Domain', slow: true do
-    before(:each) do
-      @domain_name = 'opendeliverytest-domain'
-      @domain_under_test = OpenDelivery::Domain.new('us-west-1')
-      @encrypted_domain = OpenDelivery::Domain.new('us-west-1','spec/private.pem')
-
-      @sdb = AWS::SimpleDB.new(:region => 'us-west-1')
-      AWS::SimpleDB.consistent_reads do
-        @sdb.domains.create(@domain_name)
-        until @sdb.domains[@domain_name].exists?
-          sleep 1
-        end
+  describe '#destroy' do
+    context 'when passed a domain name' do
+      it 'deletes an existing domain' do
+        expect(simpledb).to receive(:delete_domain).with(domain_name: domain_name)
+        domain_under_test.destroy(domain_name)
       end
-      @filename = 'temp.json'
-      File.open(@filename, 'w') {|f| f.write('{  "test": { "testFieldOne" : "testValueOne", "testFieldTwo" : "testValueTwoA" }}') }
-    end
-
-
-    describe 'Load Domain' do
-      it 'should load the json file entries into the domain' do
-        @domain_under_test.load_domain(@domain_name, @filename)
-
-        actual_value = @domain_under_test.get_property(@domain_name, 'test', 'testFieldOne')
-        actual_value.should eql 'testValueOne'
-
-        actual_value = @domain_under_test.get_property(@domain_name, 'test', 'testFieldTwo')
-        actual_value.should eql 'testValueTwoA'
-      end
-    end
-
-
-    after(:each) do
-      AWS::SimpleDB.consistent_reads do
-        @sdb.domains[@domain_name].delete!
-      end
-
-      if File.exists? @filename then File.delete @filename end
-
     end
   end
 
+  describe '#load_domain' do
+    context 'when given a valid json document' do
+      it 'loads the json file entries into the domain' do
+        expect(domain_under_test).to receive(:set_property)
+          .with(domain_name, 'test', 'testFieldOne', 'testValueOne')
+        expect(domain_under_test).to receive(:set_property)
+          .with(domain_name, 'test', 'testFieldTwo', 'testValueTwoA')
 
-  context 'Not specifying region', slow: true do
-
-    before(:each) do
-      @domain_name = 'opendeliverytest_domain_2'
-      @domain_under_test = OpenDelivery::Domain.new
-      @encrypted_domain = OpenDelivery::Domain.new(nil,'spec/private.pem')
-      @sdb = AWS::SimpleDB.new
-    end
-
-    describe 'create domain' do
-      it 'should be able to create a domain' do
-        @domain_under_test.create(@domain_name)
-      end
-    end
-
-     describe 'Delete domain' do
-      it 'should be able to create a domain in another region' do
-
-        AWS::SimpleDB.consistent_reads do
-          @sdb.domains.create(@domain_name)
-          until @sdb.domains[@domain_name].exists?
-            sleep 1
-          end
-        end
-
-        @domain_under_test.destroy(@domain_name)
-        @sdb.domains[@domain_name].exists?.should eql false
-      end
-    end
-
-    describe 'destroy item' do
-
-      before(:each) do
-        @item_name = 'item_name'
-        @key = 'test_key_1'
-        @expected_value = 'test_value_1'
-
-        AWS::SimpleDB.consistent_reads do
-          @sdb.domains.create(@domain_name)
-          until @sdb.domains[@domain_name].exists?
-            sleep 1
-          end
-        end
-
-        @sdb.domains[@domain_name].items.create(@item_name, { @key => @expected_value } )
-      end
-
-      it 'should destroy the item' do
-        @domain_under_test.destroy_item(@domain_name, @item_name)
-        # Sleep briefly because sometimes this fails.
-        sleep 0.5
-        AWS::SimpleDB.consistent_reads do
-          domain = @sdb.domains[@domain_name]
-          items = domain.items
-          items.size.should eql 0
-        end
-      end
-
-    end
-
-    describe 'get property' do
-
-      before(:each) do
-        @item_name = 'item_name'
-        @key = 'test_key_1'
-        @key4 = 'test_key_4'
-        @expected_value = 'test_value_1'
-        @expected_value4 = 'test_value_4'
-
-        AWS::SimpleDB.consistent_reads do
-          @sdb.domains.create(@domain_name)
-          until @sdb.domains[@domain_name].exists?
-            sleep 1
-          end
-        end
-
-        @sdb.domains[@domain_name].items.create(@item_name, { @key => @expected_value } )
-        @encrypted_domain.set_encrypted_property(@domain_name, @item_name, @key4, @expected_value4)
-
-      end
-
-      it 'should return the proper value for the specified key' do
-        actual_value = @domain_under_test.get_property(@domain_name, @item_name, @key)
-        actual_value.should eql @expected_value
-      end
-
-      it 'should return the nil value for the missing key' do
-        actual_value = @domain_under_test.get_property(@domain_name, @item_name, 'bad_key')
-        actual_value.should eql nil
-      end
-
-      it 'should return the nil value for the missing item' do
-        actual_value = @domain_under_test.get_property(@domain_name, 'bad_item', 'bad_key')
-        actual_value.should eql nil
-      end
-
-      it 'should find a decrypted property' do
-        actual_value = @encrypted_domain.get_encrypted_property(@domain_name, @item_name, @key4)
-        actual_value.should eql @expected_value4
-      end
-
-      it 'should find an encrypted property' do
-        actual_value = @encrypted_domain.get_property(@domain_name, @item_name, @key4)
-        actual_value.should_not eql @expected_value4
-      end
-    end
-
-    describe 'get item attributes json' do
-
-      before(:each) do
-        @item_name = 'item_name'
-        @keys = { 'test_key_1' => 'test_value_1', 'test_key_4' => 'test_value_4' }
-        @expected_value = '[{"name":"test_key_4","value":"test_value_4"},{"name":"test_key_1","value":"test_value_1"}]'
-
-        AWS::SimpleDB.consistent_reads do
-          @sdb.domains.create(@domain_name)
-          until @sdb.domains[@domain_name].exists?
-            sleep 1
-          end
-        end
-
-        @sdb.domains[@domain_name].items.create(@item_name, @keys)
-      end
-
-      it 'should return the proper values for the specified item' do
-        actual_value = @domain_under_test.get_item_attributes_json(@domain_name, @item_name)
-        actual_value.should eql @expected_value
-      end
-
-      it 'should return the nil value for the missing item' do
-        actual_value = @domain_under_test.get_item_attributes_json(@domain_name, 'bad_item')
-        actual_value.should eql nil
-      end
-    end
-
-    describe 'set property' do
-
-      before(:each) do
-        @item_name = 'item_name'
-        @key = 'test_key_1'
-        @expected_value = 'test_value_1'
-
-        AWS::SimpleDB.consistent_reads do
-          @sdb.domains.create(@domain_name)
-          until @sdb.domains[@domain_name].exists?
-            sleep 1
-          end
-        end
-      end
-
-      it 'should set the specified value for the specified key' do
-        @domain_under_test.set_property(@domain_name, @item_name, @key, @expected_value)
-
-        AWS::SimpleDB.consistent_reads do
-          actual_value = @sdb.domains[@domain_name].items[@item_name].attributes[@key].values[0].chomp
-          actual_value.should eql @expected_value
-        end
-      end
-
-      it 'should set the value for the key to only a single value' do
-        @domain_under_test.set_property(@domain_name, @item_name, @key, @expected_value)
-        AWS::SimpleDB.consistent_reads do
-          actual_value = @sdb.domains[@domain_name].items[@item_name].attributes[@key].values[0].chomp
-          actual_value.should eql @expected_value
-        end
-
-        @domain_under_test.set_property(@domain_name, @item_name, @key, @expected_value)
-        AWS::SimpleDB.consistent_reads do
-          actual_value = @sdb.domains[@domain_name].items[@item_name].attributes[@key].values[0].chomp
-          actual_value.should eql @expected_value
-          @sdb.domains[@domain_name].items[@item_name].attributes[@key].values.size.should eql 1
+        Tempfile.open('attributes') do |file|
+          file.write('{  "test": { "testFieldOne" : "testValueOne", "testFieldTwo" : "testValueTwoA" }}')
+          file.flush
+          domain_under_test.load_domain(domain_name, file.path)
         end
       end
     end
-    after(:each) do
-     # puts "\n============= RUNNING THE AFTER BLOCK ================"
-      AWS::SimpleDB.consistent_reads do
-        @sdb.domains[@domain_name].delete!
+  end
+
+  describe '#destroy_item' do
+    context 'when given a valid item' do
+      it 'destroys the item' do
+        expect(simpledb).to receive(:delete_attributes)
+          .with(domain_name: domain_name, item_name: 'test_item')
+        domain_under_test.destroy_item(domain_name, 'test_item')
+      end
+    end
+  end
+
+  describe '#get_property' do
+    context 'when the property exists' do
+      it 'returns the proper value for the specified key' do
+        simpledb.stub_responses(
+          :get_attributes,
+          {
+            attributes: [ { name: 'key', value: 'value'} ]
+          }
+        )
+
+        expect(domain_under_test.get_property(domain_name, 'item', 'key')).to eql('value')
+      end
+    end
+
+    context 'when the property or item does not exist' do
+      it 'returns the nil' do
+        expect(domain_under_test.get_property(domain_name, 'item', 'bad_key')).to be_nil
+      end
+    end
+  end
+
+  describe '#get_encrypted_property' do
+    context 'when the property exists' do
+      it 'returns the proper value for the specified key' do
+        simpledb.stub_responses(
+          :get_attributes,
+          {
+            attributes: [ { name: 'key', value: encrypted_hash } ]
+          }
+        )
+
+        expect(domain_under_test.get_encrypted_property(domain_name, 'item', 'key')).to eql('encryptedvalue')
+      end
+    end
+  end
+
+  describe '#get_item_attributes_json' do
+    context 'when the item exists' do
+      it 'returns the attributes for the item as json' do
+        simpledb.stub_responses(
+          :get_attributes,
+          {
+            attributes: [
+              { name: 'key', value: 'value' },
+              { name: 'key2', value: 'value2'}
+            ]
+          }
+        )
+        expected_value = '[{"name":"key","value":"value"},{"name":"key2","value":"value2"}]'
+
+        expect(domain_under_test.get_item_attributes_json(domain_name, 'item')).to eql(expected_value)
+      end
+    end
+
+    context 'when the  item does not exist' do
+      it 'returns nil' do
+        expect(domain_under_test.get_item_attributes_json(domain_name, 'item')).to be_nil
+      end
+    end
+  end
+
+  describe '#set_property' do
+    context 'when given a valid domain, item and properity' do
+      it 'sets the appropriate attribute' do
+        expect(simpledb).to receive(:put_attributes)
+          .with(domain_name: domain_name, item_name: 'item', attributes: [
+            {
+              name: 'key',
+              value: 'value',
+              replace: true,
+            }
+          ])
+
+        domain_under_test.set_property(domain_name, 'item', 'key', 'value')
+      end
+    end
+  end
+
+  describe '#set_encrypted_property' do
+    context 'when given a valid domain, item and properity' do
+      it 'sets the appropriate attribute' do
+        expect(domain_under_test).to_not receive(:set_property)
+          .with(domain_name, 'item', 'key', 'encryptedvalue')
+
+        domain_under_test.set_encrypted_property(domain_name, 'item', 'key', 'encryptedvalue')
       end
     end
   end
