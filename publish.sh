@@ -20,17 +20,18 @@ chmod 0600 ~/.gem/credentials
 #gem used manual versioning up through 0.4.3, so start off
 #at 0.4.4 and just keep "patching" through 0.4.N
 #might have been less surprising to restart at 0.5.x given we are nuking so much
-current_version=$(ruby -e 'tags=`git tag -l v0\.4\.*`' \
-                       -e 'p tags.lines.map { |tag| tag.sub(/v0.4./, "").chomp.to_i }.max')
+current_version=$(ruby -e 'tags=`git tag -l v0\.5\.*`' \
+                       -e 'p tags.lines.map { |tag| tag.sub(/v0.5./, "").chomp.to_i }.max')
 
 if [[ ${current_version} == nil ]];
 then
   #for issue scraping
-  current_version=origin
+  current_version='v0.4.10'
 
-  new_version='0.4.4'
+  new_version='0.5.0'
 else
-  new_version=0.4.$((current_version+1))
+  new_version=0.5.$((current_version+1))
+  current_version=$(v0.5.${current_version})
 fi
 
 sed -i "s/0\.0\.0/${new_version}/g" opendelivery.gemspec
@@ -41,7 +42,7 @@ cat opendelivery.gemspec
 head=$(git log -n 1 --oneline | awk '{print $1}')
 
 echo "Remember! You need to start your commit messages with #x, where x is the issue number your commit resolves."
-issues=$(git log v0.4.${current_version}..${head} --oneline | awk '{print $2}' | grep '^#' | uniq)
+issues=$(git log ${current_version}..${head} --oneline | awk '{print $2}' | grep '^#' | uniq)
 
 git tag -a v${new_version} -m "Issues with commits, not necessarily closed: ${issues}"
 
