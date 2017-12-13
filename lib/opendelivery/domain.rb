@@ -20,7 +20,7 @@
 #OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 #THE SOFTWARE.
 
-require 'aws-sdk-core'
+require 'aws-sdk-simpledb'
 require 'encrypto_signo'
 
 module OpenDelivery
@@ -113,15 +113,7 @@ module OpenDelivery
 
       obj.each do |item, attributes|
         attributes.each do |key,value|
-          @sdb.put_attributes(domain_name: domain,
-                              item_name: item,
-                              attributes: [
-                                {
-                                  name: key,
-                                  value: value,
-                                  replace: true,
-                                }
-                              ])
+          set_property(domain, item, key, value)
         end
       end
     end
